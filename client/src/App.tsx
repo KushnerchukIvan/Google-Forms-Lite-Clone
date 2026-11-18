@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { BuilderPage } from './pages/BuilderPage';
 import { FillPage } from './pages/FillPage';
@@ -9,9 +9,9 @@ export function App() {
     <BrowserRouter>
       <div className="app-shell">
         <nav className="topbar">
-          <a href="/" className="brand">
+          <Link to="/" className="brand">
             <span className="brand-mark">F</span> Forms Lite
-          </a>
+          </Link>
           <span className="topbar-note">Simple form builder</span>
         </nav>
         <Routes>

@@ -28,6 +28,6 @@ RTK Query owns server state and caching, including form and response data. The R
 
 ## Code generation and tests
 
-GraphQL Code Generator reads the shared schema and client operation documents to create server resolver types and RTK Query hooks. The RTK Query codegen plugin injects generated endpoints into the shared base API; hand-written endpoint types or separate client/server model declarations would drift from the schema. A post-generation normalization step removes generator-emitted unsafe types and comments to preserve the project's strict typing and no-code-comments requirements.
+GraphQL Code Generator reads the shared schema and client operation documents to create server resolver types and RTK Query hooks. The RTK Query codegen plugin injects generated endpoints into the shared base API; hand-written endpoint types or separate client/server model declarations would drift from the schema. A post-generation normalization step removes generator-emitted unsafe types and comments to preserve the project's strict typing conventions.
 
 Vitest covers pure client validation/transformation functions, Redux draft behavior, a builder component case, server validation, and GraphQL resolver flows. Pure-function tests keep domain rules fast to isolate, while resolver tests exercise the schema and API behavior without starting a separate HTTP process. Broader end-to-end testing could add value as the application grows, but is not needed to cover the critical current flows.

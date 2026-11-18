@@ -106,7 +106,7 @@ The client validates common form errors for immediate feedback. The server repea
 
 ### Code generation
 
-The codegen configuration reads the shared GraphQL schema and client operation documents. It generates schema/operation types and RTK Query hooks. Generated files are build artifacts; rerun `npm run codegen` after changing the schema or GraphQL operations.
+The codegen configuration reads the shared GraphQL schema and client operation documents. It generates schema/operation types and RTK Query hooks. Generated files are committed build artifacts so changes are visible in reviews and available in fresh checkouts. Rerun `npm run codegen` after changing the schema or GraphQL operations.
 
 ### Tests
 
