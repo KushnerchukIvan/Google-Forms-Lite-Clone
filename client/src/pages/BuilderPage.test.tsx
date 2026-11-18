@@ -17,5 +17,9 @@ describe('BuilderPage', () => {
 
     expect(markup).toContain('Form title');
     expect(markup).toContain('id="form-title"');
+    expect(markup).toContain('+ Text');
+    expect(markup).toContain('+ Multiple choice');
+    expect(markup).toContain('+ Checkboxes');
+    expect(markup).toContain('+ Date');
   });
 });

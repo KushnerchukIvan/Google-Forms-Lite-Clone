@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Form } from './domain.js';
-import { validateAnswers } from './validation.js';
+import { validateAnswers, validateQuestions } from './validation.js';
 
 const form: Form = {
   id: 'form-1',
@@ -47,5 +47,52 @@ describe('validateAnswers', () => {
         { questionId: 'q2', value: ['2026-02-31'] },
       ]);
     }).toThrow('Date answers must use YYYY-MM-DD format.');
+  });
+
+  it('accepts choice answers by option ID', () => {
+    const choiceForm: Form = {
+      ...form,
+      questions: [
+        ...form.questions,
+        {
+          id: 'q3',
+          title: 'Choice',
+          type: 'MULTIPLE_CHOICE',
+          required: false,
+          options: [
+            { id: 'option-1', label: 'First' },
+            { id: 'option-2', label: 'Second' },
+          ],
+          order: 2,
+        },
+      ],
+    };
+
+    expect(() => {
+      validateAnswers(choiceForm, [
+        { questionId: 'q1', value: ['Ada'] },
+        { questionId: 'q3', value: ['option-2'] },
+      ]);
+    }).not.toThrow();
+  });
+});
+
+describe('validateQuestions', () => {
+  it('rejects duplicate option IDs', () => {
+    expect(() => {
+      validateQuestions([
+        {
+          id: 'choice',
+          title: 'Choice',
+          type: 'MULTIPLE_CHOICE',
+          required: false,
+          options: [
+            { id: 'duplicate', label: 'First' },
+            { id: 'duplicate', label: 'Second' },
+          ],
+          order: 0,
+        },
+      ]);
+    }).toThrow('Option IDs must be unique.');
   });
 });

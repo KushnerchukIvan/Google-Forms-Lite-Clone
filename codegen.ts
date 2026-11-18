@@ -8,7 +8,7 @@ const config: CodegenConfig = {
       plugins: ['typescript', 'typescript-resolvers'],
       config: {
         enumsAsTypes: true,
-        scalars: { ID: 'string', DateTime: 'string' },
+        scalars: { ID: 'string' },
         contextType: '../context#GraphQLContext',
         useTypeImports: true,
       },
@@ -26,7 +26,7 @@ const config: CodegenConfig = {
       ],
       config: {
         enumsAsTypes: true,
-        scalars: { ID: 'string', DateTime: 'string' },
+        scalars: { ID: 'string' },
         importSchemaTypesFrom: './shared/src/generated/graphql.ts',
         namespacedImportName: 'Types',
         useTypeImports: true,

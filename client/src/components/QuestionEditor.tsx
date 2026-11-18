@@ -4,7 +4,10 @@ interface Props {
   question: FormDraftQuestion;
   index: number;
   total: number;
-  onChange: (question: FormDraftQuestion) => void;
+  onChange: (changes: Partial<Omit<FormDraftQuestion, 'id'>>) => void;
+  onOptionAdd: (option: FormDraftQuestion['options'][number]) => void;
+  onOptionChange: (optionId: string, label: string) => void;
+  onOptionRemove: (optionId: string) => void;
   onRemove: () => void;
   onMove: (direction: -1 | 1) => void;
 }
@@ -14,18 +17,12 @@ export function QuestionEditor({
   index,
   total,
   onChange,
+  onOptionAdd,
+  onOptionChange,
+  onOptionRemove,
   onRemove,
   onMove,
 }: Props) {
-  const updateOption = (optionId: string, label: string) => {
-    onChange({
-      ...question,
-      options: question.options.map((option) =>
-        option.id === optionId ? { ...option, label } : option,
-      ),
-    });
-  };
-
   return (
     <section className="panel question-editor">
       <div className="question-toolbar">
@@ -67,7 +64,7 @@ export function QuestionEditor({
         value={question.title}
         placeholder="Question title"
         onChange={(event) => {
-          onChange({ ...question, title: event.target.value });
+          onChange({ title: event.target.value });
         }}
       />
       <div className="question-toolbar">
@@ -77,7 +74,7 @@ export function QuestionEditor({
             type="checkbox"
             checked={question.required}
             onChange={(event) => {
-              onChange({ ...question, required: event.target.checked });
+              onChange({ required: event.target.checked });
             }}
           />{' '}
           Required
@@ -92,7 +89,7 @@ export function QuestionEditor({
                 className="field"
                 value={option.label}
                 onChange={(event) => {
-                  updateOption(option.id, event.target.value);
+                  onOptionChange(option.id, event.target.value);
                 }}
               />
               <button
@@ -100,12 +97,7 @@ export function QuestionEditor({
                 className="icon-button"
                 aria-label="Remove option"
                 onClick={() => {
-                  onChange({
-                    ...question,
-                    options: question.options.filter(
-                      (item) => item.id !== option.id,
-                    ),
-                  });
+                  onOptionRemove(option.id);
                 }}
               >
                 ×
@@ -116,15 +108,9 @@ export function QuestionEditor({
             type="button"
             className="text-button"
             onClick={() => {
-              onChange({
-                ...question,
-                options: [
-                  ...question.options,
-                  {
-                    id: crypto.randomUUID(),
-                    label: `Option ${String(question.options.length + 1)}`,
-                  },
-                ],
+              onOptionAdd({
+                id: crypto.randomUUID(),
+                label: `Option ${String(question.options.length + 1)}`,
               });
             }}
           >

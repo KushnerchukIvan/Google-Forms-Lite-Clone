@@ -2,18 +2,27 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCreateFormMutation } from '../api/enhanced';
 import { QuestionEditor } from '../components/QuestionEditor';
-import {
-  createQuestion,
-  moveQuestion,
-  validateDraft,
-} from '../services/formBuilder';
+import { createQuestion, validateDraft } from '../services/formBuilder';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
+  addOption,
+  addQuestion,
+  moveQuestion,
+  removeOption,
+  removeQuestion,
   resetDraft,
-  setDraft,
-  type FormDraft,
-  type FormDraftQuestion,
+  setDescription,
+  setTitle,
+  updateOption,
+  updateQuestion,
 } from '../store/formsSlice';
+
+const questionTypes = [
+  { type: 'TEXT', label: 'Text' },
+  { type: 'MULTIPLE_CHOICE', label: 'Multiple choice' },
+  { type: 'CHECKBOX', label: 'Checkboxes' },
+  { type: 'DATE', label: 'Date' },
+] as const;
 
 export function BuilderPage() {
   const draft = useAppSelector((state) => state.formDraft);
@@ -21,17 +30,6 @@ export function BuilderPage() {
   const [createForm, { isLoading, error }] = useCreateFormMutation();
   const [validationError, setValidationError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const updateDraft = (updater: (current: FormDraft) => FormDraft) =>
-    dispatch(setDraft(updater(draft)));
-
-  const updateQuestion = (index: number, question: FormDraftQuestion) => {
-    updateDraft((current) => ({
-      ...current,
-      questions: current.questions.map((item, itemIndex) =>
-        itemIndex === index ? question : item,
-      ),
-    }));
-  };
 
   const save = async () => {
     const validation = validateDraft(draft);
@@ -77,10 +75,7 @@ export function BuilderPage() {
           value={draft.title}
           placeholder="Untitled form"
           onChange={(event) => {
-            updateDraft((current) => ({
-              ...current,
-              title: event.target.value,
-            }));
+            dispatch(setTitle(event.target.value));
           }}
         />
         <textarea
@@ -88,10 +83,7 @@ export function BuilderPage() {
           value={draft.description}
           placeholder="Form description (optional)"
           onChange={(event) => {
-            updateDraft((current) => ({
-              ...current,
-              description: event.target.value,
-            }));
+            dispatch(setDescription(event.target.value));
           }}
         />
       </section>
@@ -101,75 +93,43 @@ export function BuilderPage() {
           question={question}
           index={index}
           total={draft.questions.length}
-          onChange={(updated) => {
-            updateQuestion(index, updated);
+          onChange={(changes) => {
+            dispatch(updateQuestion({ id: question.id, changes }));
+          }}
+          onOptionAdd={(option) => {
+            dispatch(addOption({ questionId: question.id, option }));
+          }}
+          onOptionChange={(optionId, label) => {
+            dispatch(
+              updateOption({ questionId: question.id, optionId, label }),
+            );
+          }}
+          onOptionRemove={(optionId) => {
+            dispatch(removeOption({ questionId: question.id, optionId }));
           }}
           onRemove={() => {
-            updateDraft((current) => ({
-              ...current,
-              questions: current.questions.filter(
-                (_, itemIndex) => itemIndex !== index,
-              ),
-            }));
+            dispatch(removeQuestion(question.id));
           }}
           onMove={(direction) => {
-            updateDraft((current) => ({
-              ...current,
-              questions: moveQuestion(current.questions, index, direction),
-            }));
+            dispatch(moveQuestion({ id: question.id, direction }));
           }}
         />
       ))}
       <section className="panel add-question">
         <h3>Add a question</h3>
         <div className="type-buttons">
-          <button
-            className="button secondary"
-            onClick={() => {
-              updateDraft((current) => ({
-                ...current,
-                questions: [...current.questions, createQuestion('TEXT')],
-              }));
-            }}
-          >
-            + Text
-          </button>
-          <button
-            className="button secondary"
-            onClick={() => {
-              updateDraft((current) => ({
-                ...current,
-                questions: [
-                  ...current.questions,
-                  createQuestion('MULTIPLE_CHOICE'),
-                ],
-              }));
-            }}
-          >
-            + Multiple choice
-          </button>
-          <button
-            className="button secondary"
-            onClick={() => {
-              updateDraft((current) => ({
-                ...current,
-                questions: [...current.questions, createQuestion('CHECKBOX')],
-              }));
-            }}
-          >
-            + Checkboxes
-          </button>
-          <button
-            className="button secondary"
-            onClick={() => {
-              updateDraft((current) => ({
-                ...current,
-                questions: [...current.questions, createQuestion('DATE')],
-              }));
-            }}
-          >
-            + Date
-          </button>
+          {questionTypes.map(({ type, label }) => (
+            <button
+              key={type}
+              type="button"
+              className="button secondary"
+              onClick={() => {
+                dispatch(addQuestion(createQuestion(type)));
+              }}
+            >
+              + {label}
+            </button>
+          ))}
         </div>
       </section>
       {(validationError || error) && (

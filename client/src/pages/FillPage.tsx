@@ -1,86 +1,8 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useGetFormQuery, useSubmitResponseMutation } from '../api/enhanced';
-import type { GetFormQuery } from '../api/generated';
-import { assertNever } from '@forms/shared';
+import { AnswerField } from '../components/AnswerField';
 import { toAnswerInputs, validateResponse } from '../services/answers';
-
-type FormQuestion = NonNullable<GetFormQuery['form']>['questions'][number];
-
-const renderAnswerField = (
-  question: FormQuestion,
-  selectedValues: string[],
-  setValue: (questionId: string, value: string[]) => void,
-) => {
-  switch (question.type) {
-    case 'TEXT':
-      return (
-        <input
-          id={`answer-${question.id}`}
-          className="field"
-          value={selectedValues[0] ?? ''}
-          placeholder="Your answer"
-          onChange={(event) => {
-            setValue(question.id, [event.target.value]);
-          }}
-        />
-      );
-    case 'DATE':
-      return (
-        <input
-          id={`answer-${question.id}`}
-          className="field date-field"
-          type="date"
-          value={selectedValues[0] ?? ''}
-          onChange={(event) => {
-            setValue(question.id, [event.target.value]);
-          }}
-        />
-      );
-    case 'MULTIPLE_CHOICE':
-      return (
-        <div className="choice-list">
-          {question.options.map((option) => (
-            <label className="choice" key={option.id}>
-              <input
-                type="radio"
-                name={question.id}
-                checked={selectedValues[0] === option.label}
-                onChange={() => {
-                  setValue(question.id, [option.label]);
-                }}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      );
-    case 'CHECKBOX':
-      return (
-        <div className="choice-list">
-          {question.options.map((option) => (
-            <label className="choice" key={option.id}>
-              <input
-                type="checkbox"
-                checked={selectedValues.includes(option.label)}
-                onChange={(event) => {
-                  setValue(
-                    question.id,
-                    event.target.checked
-                      ? [...selectedValues, option.label]
-                      : selectedValues.filter((item) => item !== option.label),
-                  );
-                }}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      );
-    default:
-      return assertNever(question.type);
-  }
-};
 
 export function FillPage() {
   const { id = '' } = useParams();
@@ -160,7 +82,13 @@ export function FillPage() {
             {question.title}
             {question.required && <span className="required"> *</span>}
           </label>
-          {renderAnswerField(question, values[question.id] ?? [], setValue)}
+          <AnswerField
+            question={question}
+            value={values[question.id] ?? []}
+            onChange={(value) => {
+              setValue(question.id, value);
+            }}
+          />
         </section>
       ))}
       {validationError && <p className="error-message">{validationError}</p>}

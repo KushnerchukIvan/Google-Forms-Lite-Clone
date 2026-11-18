@@ -1,11 +1,10 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { createResolvers } from './resolvers.js';
 import { store } from './store.js';
 
-const schemaPath = resolve(process.cwd(), '../shared/schema.graphql');
+const schemaPath = new URL('../../shared/schema.graphql', import.meta.url);
 const typeDefs = await readFile(schemaPath, 'utf8');
 const yoga = createYoga({
   schema: createSchema({ typeDefs, resolvers: createResolvers(store) }),

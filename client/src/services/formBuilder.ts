@@ -16,22 +16,6 @@ export const createQuestion = (
       : [],
 });
 
-export const moveQuestion = (
-  questions: FormDraftQuestion[],
-  index: number,
-  direction: -1 | 1,
-): FormDraftQuestion[] => {
-  const target = index + direction;
-  if (target < 0 || target >= questions.length) return questions;
-  const next = [...questions];
-  const current = next[index];
-  const destination = next[target];
-  if (!current || !destination) return questions;
-  next[index] = destination;
-  next[target] = current;
-  return next;
-};
-
 export const validateDraft = (draft: FormDraft): string | null => {
   if (!draft.title.trim()) return 'Enter a form title.';
   if (draft.questions.length === 0) return 'Add at least one question.';
@@ -45,6 +29,9 @@ export const validateDraft = (draft: FormDraft): string | null => {
       return 'Choice questions need at least two non-empty options.';
     }
     if (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') {
+      const optionIds = question.options.map((option) => option.id);
+      if (new Set(optionIds).size !== optionIds.length)
+        return 'Choice option IDs must be unique.';
       const labels = question.options.map((option) => option.label.trim());
       if (new Set(labels).size !== labels.length)
         return 'Choice options must be unique.';

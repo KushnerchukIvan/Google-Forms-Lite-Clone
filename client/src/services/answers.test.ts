@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GetFormQuery } from '../api/generated';
-import { toAnswerInputs, validateResponse } from './answers';
+import { formatAnswer, toAnswerInputs, validateResponse } from './answers';
 
 type FormData = NonNullable<GetFormQuery['form']>;
 
@@ -49,8 +49,18 @@ describe('answer transformations', () => {
   });
 
   it('rejects choices that do not belong to the question', () => {
-    expect(validateResponse(form, { choice: ['Other'] })).toBe(
+    expect(validateResponse(form, { choice: ['other-id'] })).toBe(
       '"Choice" contains an invalid option.',
     );
+  });
+
+  it('uses option IDs for choice answers and formats them with labels', () => {
+    const choice = form.questions.find((question) => question.id === 'choice');
+    expect(choice).toBeDefined();
+    if (!choice) return;
+
+    expect(validateResponse(form, { choice: ['one'] })).toBeNull();
+    expect(formatAnswer(choice, ['one'])).toEqual(['One']);
+    expect(formatAnswer(choice, ['unknown'])).toEqual(['unknown']);
   });
 });

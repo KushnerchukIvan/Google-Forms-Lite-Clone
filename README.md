@@ -16,7 +16,7 @@ npm run dev
 
 Open the client at http://localhost:5173. The GraphQL endpoint is available at http://localhost:4000/graphql.
 
-The dev command runs GraphQL code generation first and then starts the API and Vite client together. The API uses an in-memory store, so all forms and responses are reset when the server restarts.
+The dev command generates GraphQL artifacts, builds the shared package, and then starts the API and Vite client together. The API uses an in-memory store, so all forms and responses are reset when the server restarts.
 
 ## Commands
 
@@ -82,7 +82,7 @@ The list inputs and list outputs are strengthened to non-null lists of non-null 
 
 ### Answer representation
 
-`Answer.value` is `[String!]!`. This supports one text/date/single-choice value and multiple checkbox values while keeping the GraphQL model compact. The server validates cardinality and allowed option values against the corresponding question type. A GraphQL union was avoided because clients would need to branch on multiple object types for a simple display model.
+`Answer.value` is `[String!]!`. This supports one text/date value, one selected option ID for single choice, and multiple option IDs for checkboxes while keeping the GraphQL model compact. The server validates cardinality and allowed option IDs against the corresponding question type. A GraphQL union was avoided because clients would need to branch on multiple object types for a simple display model.
 
 ### Required questions and ordering
 

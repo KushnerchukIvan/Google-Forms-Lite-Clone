@@ -262,6 +262,9 @@ h3 {
   resize: vertical;
   min-height: 72px;
 }
+.builder-intro > .textarea {
+  margin-top: 12px;
+}
 .question-editor {
   margin-bottom: 13px;
 }

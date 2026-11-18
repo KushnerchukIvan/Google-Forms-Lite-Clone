@@ -1,14 +1,20 @@
 import type { AnswerInput } from '@forms/shared';
+import { isValidDate } from '@forms/shared';
 import type { GetFormQuery } from '../api/generated';
 
 type FormData = NonNullable<GetFormQuery['form']>;
 
-const isValidDate = (value: string): boolean => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  return (
-    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+export const formatAnswer = (
+  question: FormData['questions'][number],
+  values: readonly string[],
+): string[] => {
+  if (question.type !== 'MULTIPLE_CHOICE' && question.type !== 'CHECKBOX') {
+    return [...values];
+  }
+  const labelsById = new Map(
+    question.options.map((option) => [option.id, option.label]),
   );
+  return values.map((value) => labelsById.get(value) ?? value);
 };
 
 export const validateResponse = (
@@ -31,7 +37,7 @@ export const validateResponse = (
       return 'Enter a valid date.';
     }
     if (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') {
-      const options = new Set(question.options.map((option) => option.label));
+      const options = new Set(question.options.map((option) => option.id));
       if (nonEmptyAnswers.some((value) => !options.has(value))) {
         return `"${question.title}" contains an invalid option.`;
       }

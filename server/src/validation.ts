@@ -1,24 +1,17 @@
 import {
   assertNever,
+  isValidDate,
   type AnswerInput,
   type QuestionInput,
 } from '@forms/shared';
 import type { Form } from './domain.js';
 import { inputError } from './errors.js';
 
-const isValidDate = (value: string): boolean => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  return (
-    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
-  );
-};
-
 const validateChoiceAnswer = (
   question: Form['questions'][number],
   answer: AnswerInput,
 ): void => {
-  const allowed = new Set(question.options.map((option) => option.label));
+  const allowed = new Set(question.options.map((option) => option.id));
   if (answer.value.some((value) => !allowed.has(value))) {
     throw inputError(
       `An answer for "${question.title}" is not one of its options.`,
@@ -40,6 +33,10 @@ export const validateQuestions = (
     if (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') {
       if (question.options.length < 2)
         throw inputError('Choice questions need at least two options.');
+      const optionIds = question.options.map((option) => option.id);
+      if (new Set(optionIds).size !== optionIds.length) {
+        throw inputError('Option IDs must be unique.');
+      }
       const labels = question.options.map((option) => option.label.trim());
       if (
         labels.some((label) => !label) ||

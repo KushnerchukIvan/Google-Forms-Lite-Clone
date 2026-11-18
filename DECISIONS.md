@@ -8,7 +8,7 @@ The project uses npm workspaces for `client`, `server`, and `shared`. npm worksp
 
 List inputs and outputs use non-null lists of non-null items, such as `[QuestionInput!]!` and `[Response!]!`. This is stricter than the nullable signatures in the initial request: a missing collection is not meaningful for form creation or response queries, and null elements cannot be processed as domain entities. `form(id:)` stays nullable because an unknown ID is a normal lookup result. Descriptions may be omitted on input and are normalized to an empty string.
 
-An answer stores `value: [String!]!`. A text/date/single-choice answer has one string and a checkbox answer can have several. A GraphQL union or separate value fields would introduce several response shapes and client-side branches without adding useful validation; the server instead validates answer cardinality and allowed choice values against the question type. `required` is stored on each question, and integer `order` is persisted so both client and server use the same ordering.
+An answer stores `value: [String!]!`. A text/date answer has one string, a single-choice answer stores one option ID, and a checkbox answer can store several option IDs. A GraphQL union or separate value fields would introduce several response shapes and client-side branches without adding useful validation; the server instead validates answer cardinality and allowed option IDs against the question type. `required` is stored on each question, and integer `order` is persisted so both client and server use the same ordering.
 
 ## Server structure and errors
 

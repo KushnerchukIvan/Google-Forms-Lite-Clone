@@ -8,7 +8,7 @@
     "shared"
   ],
   "scripts": {
-    "dev": "npm run codegen && concurrently -k -n SERVER,CLIENT -c blue,green \"npm:dev -w server\" \"npm:dev -w client\"",
+    "dev": "npm run codegen && npm run build -w shared && concurrently -k -n SERVER,CLIENT -c blue,green \"npm:dev -w server\" \"npm:dev -w client\"",
     "build": "npm run codegen && npm run build -w shared && npm run build -w server && npm run build -w client",
     "codegen": "graphql-codegen --config codegen.ts && node scripts/normalize-generated.mjs && prettier --write client/src/api/generated.ts shared/src/generated/graphql.ts",
     "typecheck": "npm run codegen && npm run build -w shared && npm run typecheck -w server && npm run typecheck -w client",

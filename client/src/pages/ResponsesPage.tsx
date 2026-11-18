@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useGetFormQuery, useGetResponsesQuery } from '../api/enhanced';
+import { formatAnswer } from '../services/answers';
 
 export function ResponsesPage() {
   const { id = '' } = useParams();
@@ -80,7 +81,7 @@ export function ResponsesPage() {
               <div className="response-answer" key={question.id}>
                 <strong>{question.title}</strong>
                 <p>
-                  {answer?.value.join(', ') || (
+                  {formatAnswer(question, answer?.value ?? []).join(', ') || (
                     <span className="muted">No answer</span>
                   )}
                 </p>
