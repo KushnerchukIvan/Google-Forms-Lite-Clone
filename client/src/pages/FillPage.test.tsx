@@ -1,14 +1,20 @@
-import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GetFormQuery } from '../api/generated';
-import { useGetFormQuery, useSubmitResponseMutation } from '../api/enhanced';
-import { FillPage } from './FillPage';
+// @vitest-environment jsdom
 
-vi.mock('../api/enhanced', () => ({
-  useGetFormQuery: vi.fn(),
-  useSubmitResponseMutation: vi.fn(),
-}));
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { GetFormQuery } from '../api/generated';
+import { api } from '../api/enhanced';
+import { client } from '../api/baseApi';
+import { FillPage } from './FillPage';
+import { createAppStore } from '../store/store';
 
 const form: NonNullable<GetFormQuery['form']> = {
   id: 'form-1',
@@ -30,33 +36,55 @@ const form: NonNullable<GetFormQuery['form']> = {
   ],
 };
 
-describe('FillPage', () => {
-  beforeEach(() => {
-    vi.mocked(useGetFormQuery).mockReturnValue({
-      data: { form },
-      isLoading: false,
-      error: undefined,
-      refetch: vi.fn(),
-    } as ReturnType<typeof useGetFormQuery>);
-    vi.mocked(useSubmitResponseMutation).mockReturnValue([
-      vi.fn(),
-      { isLoading: false, isSuccess: false, reset: vi.fn() },
-    ] as ReturnType<typeof useSubmitResponseMutation>);
-  });
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
-  it('renders choice answers keyed by option ID', () => {
-    const markup = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/forms/form-1/fill']}>
-        <Routes>
-          <Route path="/forms/:id/fill" element={<FillPage />} />
-        </Routes>
-      </MemoryRouter>,
+describe('FillPage', () => {
+  it('shows field validation, submits a response, and allows another submission', async () => {
+    const store = createAppStore();
+    await store.dispatch(
+      api.util.upsertQueryData('GetForm', { id: form.id }, { form }),
+    );
+    const request = vi.spyOn(client, 'request');
+    request.mockResolvedValueOnce({
+      submitResponse: {
+        id: 'response-1',
+        formId: form.id,
+        submittedAt: '2026-01-02T00:00:00.000Z',
+        answers: [{ questionId: 'choice', value: ['email-id'] }],
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[`/forms/${form.id}/fill`]}>
+          <Routes>
+            <Route path="/forms/:id/fill" element={<FillPage />} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>,
     );
 
-    expect(markup).toContain('Preferred contact');
-    expect(markup).toContain('value="email-id"');
-    expect(markup).toContain('value="phone-id"');
-    expect(markup).toContain('Email');
-    expect(markup).toContain('Phone');
+    fireEvent.click(screen.getByRole('button', { name: 'Submit response' }));
+    const validationAlert = await screen.findByRole('alert');
+    expect(validationAlert.textContent).toContain(
+      '“Preferred contact” is required.',
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Email' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Submit response' }));
+    expect(
+      await screen.findByRole('heading', { name: 'Response submitted!' }),
+    ).toBeDefined();
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Submit another response' }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole('radio', { name: 'Email' }).matches(':checked'),
+      ).toBe(false);
+    });
   });
 });

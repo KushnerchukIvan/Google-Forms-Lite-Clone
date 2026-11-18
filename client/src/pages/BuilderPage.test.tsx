@@ -1,13 +1,19 @@
-import { renderToStaticMarkup } from 'react-dom/server';
+// @vitest-environment jsdom
+
+import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { BuilderPage } from './BuilderPage';
-import { store } from '../store/store';
+import { createAppStore } from '../store/store';
+
+afterEach(cleanup);
 
 describe('BuilderPage', () => {
-  it('renders a labeled form title input', () => {
-    const markup = renderToStaticMarkup(
+  it('adds a question and shows validation beside the invalid field', () => {
+    const store = createAppStore();
+
+    render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/forms/new']}>
           <BuilderPage />
@@ -15,11 +21,16 @@ describe('BuilderPage', () => {
       </Provider>,
     );
 
-    expect(markup).toContain('Form title');
-    expect(markup).toContain('id="form-title"');
-    expect(markup).toContain('+ Text');
-    expect(markup).toContain('+ Multiple choice');
-    expect(markup).toContain('+ Checkboxes');
-    expect(markup).toContain('+ Date');
+    fireEvent.change(screen.getByLabelText('Form title'), {
+      target: { value: 'Weekend plans' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '+ Text' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save form' }));
+
+    const title = screen.getByRole('textbox', { name: 'Question title' });
+    expect(title.getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Every question needs a title.',
+    );
   });
 });

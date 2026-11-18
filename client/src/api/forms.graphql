@@ -6,14 +6,6 @@ query GetForms {
     createdAt
     questions {
       id
-      title
-      type
-      required
-      order
-      options {
-        id
-        label
-      }
     }
   }
 }

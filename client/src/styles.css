@@ -258,6 +258,9 @@ h3 {
   border-color: #8178e7;
   box-shadow: 0 0 0 3px #6258dc12;
 }
+.field[aria-invalid='true'] {
+  border-color: #bd4141;
+}
 .textarea {
   resize: vertical;
   min-height: 72px;
@@ -335,6 +338,15 @@ h3 {
   display: block;
   font-weight: 600;
   margin-bottom: 15px;
+}
+.choice-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.choice-fieldset .question-label {
+  padding: 0;
 }
 .required {
   color: #d64c4c;

@@ -16,14 +16,7 @@ export type GetFormsQuery = {
     title: string;
     description: string;
     createdAt: string;
-    questions: Array<{
-      id: string;
-      title: string;
-      type: Types.QuestionType;
-      required: boolean;
-      order: number;
-      options: Array<{ id: string; label: string }>;
-    }>;
+    questions: Array<{ id: string }>;
   }>;
 };
 
@@ -106,12 +99,12 @@ export class TypedDocumentString<TResult, TVariables>
     DocumentTypeDecoration<TResult, TVariables>['__apiType']
   >;
   private value: string;
-  public __meta__: Record<string, unknown> | undefined;
+  public __meta__?: Record<string, unknown>;
 
   constructor(value: string, __meta__?: Record<string, unknown>) {
     super(value);
     this.value = value;
-    this.__meta__ = __meta__;
+    if (__meta__ !== undefined) this.__meta__ = __meta__;
   }
 
   override toString(): string & DocumentTypeDecoration<TResult, TVariables> {
@@ -128,14 +121,6 @@ export const GetFormsDocument = new TypedDocumentString(`
     createdAt
     questions {
       id
-      title
-      type
-      required
-      order
-      options {
-        id
-        label
-      }
     }
   }
 }

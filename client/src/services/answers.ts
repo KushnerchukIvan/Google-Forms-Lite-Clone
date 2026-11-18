@@ -20,33 +20,39 @@ export const formatAnswer = (
 export const validateResponse = (
   form: FormData,
   values: Record<string, string[]>,
-): string | null => {
+): Record<string, string> => {
+  const errors: Record<string, string> = {};
   for (const question of form.questions) {
     const answer = values[question.id] ?? [];
     const nonEmptyAnswers = answer.filter((value) => value.trim());
-    if (question.required && nonEmptyAnswers.length === 0)
-      return `“${question.title}” is required.`;
+    if (question.required && nonEmptyAnswers.length === 0) {
+      errors[question.id] = `“${question.title}” is required.`;
+      continue;
+    }
     if (question.type !== 'CHECKBOX' && nonEmptyAnswers.length > 1) {
-      return `"${question.title}" accepts one answer.`;
+      errors[question.id] = `"${question.title}" accepts one answer.`;
+      continue;
     }
     if (
       question.type === 'DATE' &&
       nonEmptyAnswers.length === 1 &&
       !isValidDate(nonEmptyAnswers[0] ?? '')
     ) {
-      return 'Enter a valid date.';
+      errors[question.id] = 'Enter a valid date.';
+      continue;
     }
     if (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') {
       const options = new Set(question.options.map((option) => option.id));
       if (nonEmptyAnswers.some((value) => !options.has(value))) {
-        return `"${question.title}" contains an invalid option.`;
+        errors[question.id] = `"${question.title}" contains an invalid option.`;
+        continue;
       }
       if (new Set(nonEmptyAnswers).size !== nonEmptyAnswers.length) {
-        return `"${question.title}" contains duplicate options.`;
+        errors[question.id] = `"${question.title}" contains duplicate options.`;
       }
     }
   }
-  return null;
+  return errors;
 };
 
 export const toAnswerInputs = (

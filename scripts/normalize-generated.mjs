@@ -7,13 +7,20 @@ const generatedFiles = [
     replacements: [
       [/^[ \t]*\/\*\*.*?\*\/[ \t]*\r?\n/gm, ''],
       [/Record<string, any>/g, 'Record<string, unknown>'],
-      [/Record<string, unknown> \| undefined/g, 'Record<string, unknown>'],
-      [
-        /public __meta__\?: Record<string, unknown>;/g,
-        'public __meta__: Record<string, unknown> | undefined;',
-      ],
       [/(\w+Document) as unknown as string/g, '$1.toString()'],
       [/\| void/g, '| undefined'],
+      [
+        /public __meta__\?: Record<string, unknown> \| undefined;/g,
+        'public __meta__?: Record<string, unknown>;',
+      ],
+      [
+        /(__meta__\?: Record<string, unknown>) \| undefined/g,
+        '$1',
+      ],
+      [
+        /this\.__meta__ = __meta__;/g,
+        'if (__meta__ !== undefined) this.__meta__ = __meta__;',
+      ],
     ],
   },
   {

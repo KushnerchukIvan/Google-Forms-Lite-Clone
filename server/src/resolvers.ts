@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Resolvers } from '@forms/shared';
+import { FORM_LIMITS, type Resolvers } from '@forms/shared';
 import type { Store, Question } from './domain.js';
 import { inputError, notFoundError } from './errors.js';
 import { validateAnswers, validateQuestions } from './validation.js';
@@ -19,6 +19,16 @@ export const createResolvers = (store: Store): Resolvers => ({
   Mutation: {
     createForm: (_parent, { title, description, questions }) => {
       if (!title.trim()) throw inputError('Form title is required.');
+      if (title.trim().length > FORM_LIMITS.formTitle) {
+        throw inputError(
+          `Form titles can be at most ${String(FORM_LIMITS.formTitle)} characters.`,
+        );
+      }
+      if ((description?.length ?? 0) > FORM_LIMITS.description) {
+        throw inputError(
+          `Descriptions can be at most ${String(FORM_LIMITS.description)} characters.`,
+        );
+      }
       validateQuestions(questions);
       const normalizedQuestions: Question[] = questions
         .map((question) => ({
@@ -29,7 +39,8 @@ export const createResolvers = (store: Store): Resolvers => ({
             label: option.label.trim(),
           })),
         }))
-        .sort((a, b) => a.order - b.order);
+        .sort((a, b) => a.order - b.order)
+        .map((question, order) => ({ ...question, order }));
       const form = {
         id: randomUUID(),
         title: title.trim(),

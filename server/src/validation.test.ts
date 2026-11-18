@@ -1,3 +1,4 @@
+import { FORM_LIMITS } from '@forms/shared';
 import { describe, expect, it } from 'vitest';
 import type { Form } from './domain.js';
 import { validateAnswers, validateQuestions } from './validation.js';
@@ -94,5 +95,94 @@ describe('validateQuestions', () => {
         },
       ]);
     }).toThrow('Option IDs must be unique.');
+  });
+
+  it('rejects option labels that differ only by case', () => {
+    expect(() => {
+      validateQuestions([
+        {
+          id: 'choice',
+          title: 'Choice',
+          type: 'MULTIPLE_CHOICE',
+          required: false,
+          options: [
+            { id: 'option-1', label: 'Email' },
+            { id: 'option-2', label: 'email' },
+          ],
+          order: 0,
+        },
+      ]);
+    }).toThrow('Option labels must be unique, ignoring case.');
+  });
+
+  it('enforces question and option limits', () => {
+    expect(() => {
+      validateQuestions(
+        Array.from({ length: FORM_LIMITS.questions + 1 }, (_, index) => ({
+          id: `question-${String(index)}`,
+          title: 'Question',
+          type: 'TEXT' as const,
+          required: false,
+          options: [],
+          order: index,
+        })),
+      );
+    }).toThrow(`Forms can have at most ${String(FORM_LIMITS.questions)} questions.`);
+
+    expect(() => {
+      validateQuestions([
+        {
+          id: 'choice',
+          title: 'Choice',
+          type: 'MULTIPLE_CHOICE',
+          required: false,
+          options: Array.from(
+            { length: FORM_LIMITS.optionsPerQuestion + 1 },
+            (_, index) => ({
+              id: `option-${String(index)}`,
+              label: `Option ${String(index)}`,
+            }),
+          ),
+          order: 0,
+        },
+      ]);
+    }).toThrow(
+      `Questions can have at most ${String(FORM_LIMITS.optionsPerQuestion)} options.`,
+    );
+  });
+
+  it('enforces question and option label lengths', () => {
+    expect(() => {
+      validateQuestions([
+        {
+          id: 'question',
+          title: 'Q'.repeat(FORM_LIMITS.questionTitle + 1),
+          type: 'TEXT',
+          required: false,
+          options: [],
+          order: 0,
+        },
+      ]);
+    }).toThrow(
+      `Question titles can be at most ${String(FORM_LIMITS.questionTitle)} characters.`,
+    );
+
+    expect(() => {
+      validateQuestions([
+        {
+          id: 'choice',
+          title: 'Choice',
+          type: 'MULTIPLE_CHOICE',
+          required: false,
+          options: [
+            { id: 'option-1', label: 'A'.repeat(FORM_LIMITS.optionLabel + 1) },
+            { id: 'option-2', label: 'Second' },
+          ],
+          order: 0,
+        },
+      ]);
+    }).toThrow(
+      `Option labels must be non-empty and at most ${String(FORM_LIMITS.optionLabel)} characters.`,
+    );
   });
 });

@@ -9,6 +9,7 @@ const config: CodegenConfig = {
       config: {
         enumsAsTypes: true,
         scalars: { ID: 'string' },
+        defaultScalarType: 'unknown',
         contextType: '../context#GraphQLContext',
         useTypeImports: true,
       },
@@ -27,6 +28,7 @@ const config: CodegenConfig = {
       config: {
         enumsAsTypes: true,
         scalars: { ID: 'string' },
+        defaultScalarType: 'unknown',
         importSchemaTypesFrom: './shared/src/generated/graphql.ts',
         namespacedImportName: 'Types',
         useTypeImports: true,

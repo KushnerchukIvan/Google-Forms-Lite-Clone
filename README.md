@@ -1,4 +1,4 @@
-﻿# Forms Lite
+# Forms Lite
 
 A full-stack Google Forms-inspired application. Create forms, collect submissions, and review answers.
 
@@ -32,7 +32,7 @@ The dev command generates GraphQL artifacts, builds the shared package, and then
 
 ## Environment
 
-Copy `.env.example` to `.env` if you need to override defaults. `PORT` configures the API port. `VITE_GRAPHQL_URL` configures the GraphQL endpoint used by the browser.
+Copy `.env.example` to `.env` if you need to override defaults. `PORT` configures the API port, `VITE_GRAPHQL_URL` configures the GraphQL endpoint used by the browser, and `CORS_ORIGIN` sets the browser origin allowed by the API.
 
 ## Project structure
 
@@ -110,7 +110,7 @@ The codegen configuration reads the shared GraphQL schema and client operation d
 
 ### Tests
 
-Vitest covers server-side validation and GraphQL resolver flows, plus client-side form/answer utilities, draft state, and the builder's form-title field. Cases include required answers, date checks, question ordering, answer normalization, and GraphQL error codes. Validation functions receive their form/store dependencies explicitly, allowing focused tests without starting an HTTP server.
+Vitest covers server-side validation and GraphQL resolver flows, plus client-side form/answer utilities, draft state, and key builder/filler/response interactions. Cases include required answers, date checks, question ordering, answer normalization, and GraphQL error codes. Validation functions receive their form/store dependencies explicitly, allowing focused tests without starting an HTTP server.
 
 See [DECISIONS.md](./DECISIONS.md) for the alternatives considered and rationale for the schema, code generation, client/server structure, state, validation, errors, IDs, ordering, and tests.
 
@@ -123,3 +123,10 @@ See [DECISIONS.md](./DECISIONS.md) for the alternatives considered and rationale
 - `submitResponse(formId: ID!, answers: [AnswerInput!]!)`
 
 Open the Yoga GraphiQL interface at `http://localhost:4000/graphql` in development.
+
+## Known limitations / future work
+
+- Forms and responses are stored in memory and are lost when the API restarts; durable persistence is intentionally out of scope.
+- The form and response lists are unpaginated and intended for small datasets.
+- There is no authentication or ownership model, so forms are accessible to anyone with their links.
+- Automated browser end-to-end coverage could complement the current unit, resolver, and component interaction tests.

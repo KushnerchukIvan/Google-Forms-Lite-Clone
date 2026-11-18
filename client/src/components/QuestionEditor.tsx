@@ -1,4 +1,5 @@
 import type { FormDraftQuestion } from '../store/formsSlice';
+import { FORM_LIMITS } from '@forms/shared';
 
 interface Props {
   question: FormDraftQuestion;
@@ -8,6 +9,7 @@ interface Props {
   onOptionAdd: (option: FormDraftQuestion['options'][number]) => void;
   onOptionChange: (optionId: string, label: string) => void;
   onOptionRemove: (optionId: string) => void;
+  error?: string;
   onRemove: () => void;
   onMove: (direction: -1 | 1) => void;
 }
@@ -20,6 +22,7 @@ export function QuestionEditor({
   onOptionAdd,
   onOptionChange,
   onOptionRemove,
+  error,
   onRemove,
   onMove,
 }: Props) {
@@ -61,12 +64,26 @@ export function QuestionEditor({
       </div>
       <input
         className="field"
+        aria-label="Question title"
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `question-error-${question.id}` : undefined}
+        maxLength={FORM_LIMITS.questionTitle}
         value={question.title}
         placeholder="Question title"
         onChange={(event) => {
           onChange({ title: event.target.value });
         }}
       />
+      {error && (
+        <p
+          id={`question-error-${question.id}`}
+          className="error-message"
+          role="alert"
+          aria-live="polite"
+        >
+          {error}
+        </p>
+      )}
       <div className="question-toolbar">
         <label className="muted">{question.type.replace('_', ' ')}</label>
         <label className="check-label">
@@ -87,6 +104,7 @@ export function QuestionEditor({
             <div className="option-row" key={option.id}>
               <input
                 className="field"
+                maxLength={FORM_LIMITS.optionLabel}
                 value={option.label}
                 onChange={(event) => {
                   onOptionChange(option.id, event.target.value);

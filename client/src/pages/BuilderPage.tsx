@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FORM_LIMITS } from '@forms/shared';
 import { useCreateFormMutation } from '../api/enhanced';
 import { QuestionEditor } from '../components/QuestionEditor';
-import { createQuestion, validateDraft } from '../services/formBuilder';
+import {
+  createQuestion,
+  hasDraftValidationErrors,
+  validateDraft,
+  type DraftValidationErrors,
+} from '../services/formBuilder';
+import { getErrorMessage } from '../services/errors';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   addOption,
@@ -28,13 +35,16 @@ export function BuilderPage() {
   const draft = useAppSelector((state) => state.formDraft);
   const dispatch = useAppDispatch();
   const [createForm, { isLoading, error }] = useCreateFormMutation();
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] =
+    useState<DraftValidationErrors | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const save = async () => {
     const validation = validateDraft(draft);
-    setValidationError(validation);
-    if (validation) return;
+    setValidationErrors(validation);
+    setServerError(null);
+    if (hasDraftValidationErrors(validation)) return;
     try {
       const result = await createForm({
         title: draft.title,
@@ -46,8 +56,11 @@ export function BuilderPage() {
       }).unwrap();
       dispatch(resetDraft());
       void navigate(`/forms/${result.createForm.id}/fill`);
-    } catch {
-      setValidationError('The form could not be saved. Please try again.');
+    } catch (error) {
+      setServerError(
+        getErrorMessage(error) ??
+          'The form could not be saved. Please try again.',
+      );
     }
   };
 
@@ -72,20 +85,51 @@ export function BuilderPage() {
         <input
           id="form-title"
           className="field"
+          maxLength={FORM_LIMITS.formTitle}
+          aria-invalid={Boolean(validationErrors?.title)}
+          aria-describedby={
+            validationErrors?.title ? 'form-title-error' : undefined
+          }
           value={draft.title}
           placeholder="Untitled form"
           onChange={(event) => {
             dispatch(setTitle(event.target.value));
           }}
         />
+        {validationErrors?.title && (
+          <p
+            id="form-title-error"
+            className="error-message"
+            role="alert"
+            aria-live="polite"
+          >
+            {validationErrors.title}
+          </p>
+        )}
         <textarea
           className="field textarea"
+          maxLength={FORM_LIMITS.description}
+          aria-label="Form description"
+          aria-invalid={Boolean(validationErrors?.description)}
+          aria-describedby={
+            validationErrors?.description ? 'form-description-error' : undefined
+          }
           value={draft.description}
           placeholder="Form description (optional)"
           onChange={(event) => {
             dispatch(setDescription(event.target.value));
           }}
         />
+        {validationErrors?.description && (
+          <p
+            id="form-description-error"
+            className="error-message"
+            role="alert"
+            aria-live="polite"
+          >
+            {validationErrors.description}
+          </p>
+        )}
       </section>
       {draft.questions.map((question, index) => (
         <QuestionEditor
@@ -93,6 +137,9 @@ export function BuilderPage() {
           question={question}
           index={index}
           total={draft.questions.length}
+          {...(validationErrors?.questions[question.id]
+            ? { error: validationErrors.questions[question.id] }
+            : {})}
           onChange={(changes) => {
             dispatch(updateQuestion({ id: question.id, changes }));
           }}
@@ -131,10 +178,15 @@ export function BuilderPage() {
             </button>
           ))}
         </div>
+        {validationErrors?.form && (
+          <p className="error-message" role="alert" aria-live="polite">
+            {validationErrors.form}
+          </p>
+        )}
       </section>
-      {(validationError || error) && (
-        <p className="error-message">
-          {validationError ?? 'Something went wrong.'}
+      {(serverError || error) && (
+        <p className="error-message" role="alert" aria-live="polite">
+          {serverError ?? getErrorMessage(error) ?? 'Something went wrong.'}
         </p>
       )}
       <div className="bottom-actions">

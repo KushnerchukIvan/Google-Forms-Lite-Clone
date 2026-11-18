@@ -43,23 +43,22 @@ describe('answer transformations', () => {
   });
 
   it('rejects calendar-invalid date answers', () => {
-    expect(validateResponse(form, { date: ['2026-02-31'] })).toBe(
-      'Enter a valid date.',
-    );
+    expect(validateResponse(form, { date: ['2026-02-31'] })).toEqual({
+      date: 'Enter a valid date.',
+    });
   });
 
   it('rejects choices that do not belong to the question', () => {
-    expect(validateResponse(form, { choice: ['other-id'] })).toBe(
-      '"Choice" contains an invalid option.',
-    );
+    expect(validateResponse(form, { choice: ['other-id'] })).toEqual({
+      choice: '"Choice" contains an invalid option.',
+    });
   });
 
   it('uses option IDs for choice answers and formats them with labels', () => {
     const choice = form.questions.find((question) => question.id === 'choice');
-    expect(choice).toBeDefined();
-    if (!choice) return;
+    if (!choice) throw new Error('Expected choice question fixture.');
 
-    expect(validateResponse(form, { choice: ['one'] })).toBeNull();
+    expect(validateResponse(form, { choice: ['one'] })).toEqual({});
     expect(formatAnswer(choice, ['one'])).toEqual(['One']);
     expect(formatAnswer(choice, ['unknown'])).toEqual(['unknown']);
   });

@@ -53,7 +53,10 @@ export function ResponsesPage() {
         <div>
           <p className="eyebrow">RESPONSES</p>
           <h1>{form.title}</h1>
-          <p className="muted">{responses.length} submissions</p>
+          <p className="muted">
+            {responses.length}{' '}
+            {responses.length === 1 ? 'submission' : 'submissions'}
+          </p>
         </div>
         <Link className="button secondary" to={`/forms/${form.id}/fill`}>
           Open form
