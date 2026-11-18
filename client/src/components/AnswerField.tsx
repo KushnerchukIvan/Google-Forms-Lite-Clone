@@ -1,4 +1,4 @@
-import { assertNever } from '@forms/shared';
+import { assertNever, FORM_LIMITS } from '@forms/shared';
 import type { GetFormQuery } from '../api/generated';
 
 type FormQuestion = NonNullable<GetFormQuery['form']>['questions'][number];
@@ -31,6 +31,7 @@ export function AnswerField({
             className="field"
             value={value[0] ?? ''}
             placeholder="Your answer"
+            maxLength={FORM_LIMITS.answerText}
             aria-invalid={invalid}
             aria-describedby={errorId}
             onChange={(event) => {

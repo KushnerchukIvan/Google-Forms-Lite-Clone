@@ -35,6 +35,25 @@ describe('validateAnswers', () => {
     }).not.toThrow();
   });
 
+  it('enforces the text answer length limit', () => {
+    expect(() => {
+      validateAnswers(form, [
+        { questionId: 'q1', value: ['A'.repeat(FORM_LIMITS.answerText)] },
+      ]);
+    }).not.toThrow();
+
+    expect(() => {
+      validateAnswers(form, [
+        {
+          questionId: 'q1',
+          value: ['A'.repeat(FORM_LIMITS.answerText + 1)],
+        },
+      ]);
+    }).toThrow(
+      `Text answers can be at most ${String(FORM_LIMITS.answerText)} characters.`,
+    );
+  });
+
   it('rejects missing required answers', () => {
     expect(() => {
       validateAnswers(form, []);

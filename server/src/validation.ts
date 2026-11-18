@@ -99,6 +99,11 @@ export const validateAnswers = (
       case 'TEXT':
         if (answer.value.length > 1)
           throw inputError('Text questions accept one value.');
+        if (answer.value.some((value) => value.length > FORM_LIMITS.answerText)) {
+          throw inputError(
+            `Text answers can be at most ${String(FORM_LIMITS.answerText)} characters.`,
+          );
+        }
         break;
       case 'MULTIPLE_CHOICE':
         if (answer.value.length > 1)

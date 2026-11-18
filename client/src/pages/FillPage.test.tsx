@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { FORM_LIMITS } from '@forms/shared';
 import {
   cleanup,
   fireEvent,
@@ -33,6 +34,14 @@ const form: NonNullable<GetFormQuery['form']> = {
         { id: 'phone-id', label: 'Phone' },
       ],
     },
+    {
+      id: 'comment',
+      title: 'Comment',
+      type: 'TEXT',
+      required: false,
+      order: 1,
+      options: [],
+    },
   ],
 };
 
@@ -65,6 +74,11 @@ describe('FillPage', () => {
           </Routes>
         </MemoryRouter>
       </Provider>,
+    );
+
+    expect(screen.getByLabelText('Comment')).toHaveProperty(
+      'maxLength',
+      FORM_LIMITS.answerText,
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Submit response' }));

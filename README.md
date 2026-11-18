@@ -32,7 +32,7 @@ The dev command generates GraphQL artifacts, builds the shared package, and then
 
 ## Environment
 
-Copy `.env.example` to `.env` if you need to override defaults. `PORT` configures the API port, `VITE_GRAPHQL_URL` configures the GraphQL endpoint used by the browser, and `CORS_ORIGIN` sets the browser origin allowed by the API.
+Copy `.env.example` to `.env` if you need to override defaults. `PORT` configures the API port, `VITE_GRAPHQL_URL` configures the GraphQL endpoint used by the browser, and `CORS_ORIGIN` is a comma-separated allowlist of browser origins for the API. Add the network origin you use when opening Vite from another device.
 
 ## Project structure
 

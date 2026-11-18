@@ -52,13 +52,13 @@ export function HomePage() {
             </p>
             <div className="card-actions">
               <Link className="button" to={`/forms/${form.id}/fill`}>
-                View form
+                View Form
               </Link>
               <Link
                 className="button secondary"
                 to={`/forms/${form.id}/responses`}
               >
-                Responses
+                View Responses
               </Link>
             </div>
           </article>
