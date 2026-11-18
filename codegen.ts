@@ -1,0 +1,38 @@
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
+const config: CodegenConfig = {
+  schema: './shared/schema.graphql',
+  documents: './client/src/**/*.graphql',
+  generates: {
+    './shared/src/generated/graphql.ts': {
+      plugins: ['typescript', 'typescript-resolvers'],
+      config: {
+        enumsAsTypes: true,
+        scalars: { ID: 'string', DateTime: 'string' },
+        contextType: '../context#GraphQLContext',
+        useTypeImports: true,
+      },
+    },
+
+    './client/src/api/generated.ts': {
+      plugins: [
+        'typescript-operations',
+        {
+          'typescript-rtk-query': {
+            importBaseApiFrom: './baseApi',
+            exportHooks: true,
+          },
+        },
+      ],
+      config: {
+        enumsAsTypes: true,
+        scalars: { ID: 'string', DateTime: 'string' },
+        importSchemaTypesFrom: './shared/src/generated/graphql.ts',
+        namespacedImportName: 'Types',
+        useTypeImports: true,
+      },
+    },
+  },
+};
+
+export default config;

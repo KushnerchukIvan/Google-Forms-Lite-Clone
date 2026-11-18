@@ -1,0 +1,115 @@
+{
+  "planHash": "d7ddbc4220c1af623f84dbc1317c2fffbe48aef86671454373b24d39f060386f",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-11-17T17:45:37.9483490Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 11337,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "client-homepage-200",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\n\u003Chtml lang=\u0022en\u0022\u003E\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\n    \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\n    \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#f4f6fb\u0022 /\u003E\n    \u003Ctitle\u003EForms Lite\u003C/title\u003E\n  \u003C/head\u003E\n  \u003Cbody\u003E\n    \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\n    \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.tsx\u0022\u003E\u003C/script\u003E\n  \u003C/body\u003E\n\u003C/html\u003E\n\n--- server output ---\n\r\n\u003E @forms/client@1.0.0 dev\r\n\u003E vite --host 0.0.0.0 --host 127.0.0.1\r\n\r\n\r\n  \u001B[32m\u001B[1mVITE\u001B[22m v6.4.6\u001B[39m  \u001B[2mready in \u001B[0m\u001B[1m250\u001B[22m\u001B[2m\u001B[0m ms\u001B[22m\r\n\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://127.0.0.1:\u001B[1m5173\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 2035
+      },
+      {
+        "name": "graphql-endpoint-200",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n{\u0022errors\u0022:[{\u0022message\u0022:\u0022Must provide query string.\u0022,\u0022extensions\u0022:{\u0022code\u0022:\u0022BAD_REQUEST\u0022}}]}\n--- server output ---\n\r\n\u003E @forms/server@1.0.0 dev\r\n\u003E tsx watch src/index.ts\r\n\r\nGraphQL API ready at http://localhost:4000/graphql\r\n",
+        "durationMs": 1538
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E google-forms-lite@1.0.0 test\r\n\u003E npm run codegen \u0026\u0026 npm run build -w shared \u0026\u0026 npm run test -w server \u0026\u0026 npm run test -w client\r\n\r\n\r\n\u003E google-forms-lite@1.0.0 codegen\r\n\u003E graphql-codegen --config codegen.ts \u0026\u0026 node scripts/normalize-generated.mjs \u0026\u0026 prettier --write client/src/api/generated.ts shared/src/generated/graphql.ts\r\n\r\n\u003E Parse Configuration\r\n\u221A Parse Configuration\r\n\u003E Generate outputs\r\n\u003E Generate to ./shared/src/generated/graphql.ts\r\n\u003E Generate to ./client/src/api/generated.ts\r\n\u003E Load GraphQL schemas\r\n\u003E Load GraphQL schemas\r\n\u221A Load GraphQL schemas\r\n\u221A Load GraphQL schemas\r\n\u003E Load GraphQL documents\r\n\u003E Load GraphQL documents\r\n\u221A Load GraphQL documents\r\n\u221A Load GraphQL documents\r\n\u003E Generate\r\n\u003E Generate\r\n\u221A Generate\r\n\u221A Generate\r\n\u221A Generate to ./shared/src/generated/graphql.ts\r\n\u221A Generate to ./client/src/api/generated.ts\r\n\u221A Generate outputs\r\nclient/src/api/generated.ts 53ms\r\nshared/src/generated/graphql.ts 25ms\r\n\r\n\u003E @forms/shared@1.0.0 build\r\n\u003E tsc -p tsconfig.json\r\n\r\n\r\n\u003E @forms/server@1.0.0 test\r\n\u003E vitest run\r\n\r\n\r\n\u001B[1m\u001B[46m RUN \u001B[49m\u001B[22m \u001B[36mv3.2.7 \u001B[39m\u001B[90mC:/AllDescktop/projects/google-forms-lite/server\u001B[39m\r\n\r\n \u001B[32m\u2713\u001B[39m src/validation.test.ts \u001B[2m(\u001B[22m\u001B[2m3 tests\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 3\u001B[2mms\u001B[22m\u001B[39m\r\n \u001B[32m\u2713\u001B[39m src/resolvers.test.ts \u001B[2m(\u001B[22m\u001B[2m2 tests\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 35\u001B[2mms\u001B[22m\u001B[39m\r\n\r\n\u001B[2m Test Files \u001B[22m \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m\u001B[90m (2)\u001B[39m\r\n\u001B[2m      Tests \u001B[22m \u001B[1m\u001B[32m5 passed\u001B[39m\u001B[22m\u001B[90m (5)\u001B[39m\r\n\u001B[2m   Start at \u001B[22m 19:45:35\r\n\u001B[2m   Duration \u001B[22m 944ms\u001B[2m (transform 110ms, setup 0ms, collect 1.02s, tests 38ms, environment 0ms, prepare 226ms)\u001B[22m\r\n\r\n\r\n\u003E @forms/client@1.0.0 test\r\n\u003E vitest run\r\n\r\n\r\n\u001B[1m\u001B[46m RUN \u001B[49m\u001B[22m \u001B[36mv3.2.7 \u001B[39m\u001B[90mC:/AllDescktop/projects/google-forms-lite/client\u001B[39m\r\n\r\n \u001B[32m\u2713\u001B[39m src/services/formBuilder.test.ts \u001B[2m(\u001B[22m\u001B[2m3 tests\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 2\u001B[2mms\u001B[22m\u001B[39m\r\n \u001B[32m\u2713\u001B[39m src/services/answers.test.ts \u001B[2m(\u001B[22m\u001B[2m4 tests\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 3\u001B[2mms\u001B[22m\u001B[39m\r\n \u001B[32m\u2713\u001B[39m src/store/formsSlice.test.ts \u001B[2m(\u001B[22m\u001B[2m1 test\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 2\u001B[2mms\u001B[22m\u001B[39m\r\n \u001B[32m\u2713\u001B[39m src/pages/BuilderPage.test.tsx \u001B[2m(\u001B[22m\u001B[2m1 test\u001B[22m\u001B[2m)\u001B[22m\u001B[32m 8\u001B[2mms\u001B[22m\u001B[39m\r\n\r\n\u001B[2m Test Files \u001B[22m \u001B[1m\u001B[32m4 passed\u001B[39m\u001B[22m\u001B[90m (4)\u001B[39m\r\n\u001B[2m      Tests \u001B[22m \u001B[1m\u001B[32m9 passed\u001B[39m\u001B[22m\u001B[90m (9)\u001B[39m\r\n\u001B[2m   Start at \u001B[22m 19:45:37\r\n\u001B[2m   Duration \u001B[22m 665ms\u001B[2m (transform 160ms, setup 0ms, collect 428ms, tests 16ms, environment 0ms, prepare 413ms)\u001B[22m\r\n\r\n",
+        "durationMs": 6383,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "output_banner",
+          "testsTotal": 9,
+          "testsPassed": 9,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      }
+    ],
+    "executions": [
+      {
+        "source": "setup[0]",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "ci"
+        ],
+        "cwd": "C:\\AllDescktop\\projects\\google-forms-lite",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "client-homepage-200",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--workspace",
+          "@forms/client",
+          "--",
+          "--host",
+          "127.0.0.1"
+        ],
+        "cwd": "C:\\AllDescktop\\projects\\google-forms-lite",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "graphql-endpoint-200",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--workspace",
+          "@forms/server"
+        ],
+        "cwd": "C:\\AllDescktop\\projects\\google-forms-lite",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\AllDescktop\\projects\\google-forms-lite",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

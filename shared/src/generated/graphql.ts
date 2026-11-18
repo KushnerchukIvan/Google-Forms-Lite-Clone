@@ -1,0 +1,365 @@
+import type { GraphQLResolveInfo } from 'graphql';
+import type { GraphQLContext } from '../context';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]-?: NonNullable<T[P]>;
+};
+export type Scalars = {
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+};
+
+export type Answer = {
+  __typename?: 'Answer';
+  questionId: Scalars['ID']['output'];
+  value: Array<Scalars['String']['output']>;
+};
+
+export type AnswerInput = {
+  questionId: Scalars['ID']['input'];
+  value: Array<Scalars['String']['input']>;
+};
+
+export type Form = {
+  __typename?: 'Form';
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  questions: Array<Question>;
+  title: Scalars['String']['output'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createForm: Form;
+  submitResponse: Response;
+};
+
+export type MutationCreateFormArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  questions: Array<QuestionInput>;
+  title: Scalars['String']['input'];
+};
+
+export type MutationSubmitResponseArgs = {
+  answers: Array<AnswerInput>;
+  formId: Scalars['ID']['input'];
+};
+
+export type Option = {
+  __typename?: 'Option';
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+};
+
+export type OptionInput = {
+  id: Scalars['ID']['input'];
+  label: Scalars['String']['input'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  form?: Maybe<Form>;
+  forms: Array<Form>;
+  responses: Array<Response>;
+};
+
+export type QueryFormArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryResponsesArgs = {
+  formId: Scalars['ID']['input'];
+};
+
+export type Question = {
+  __typename?: 'Question';
+  id: Scalars['ID']['output'];
+  options: Array<Option>;
+  order: Scalars['Int']['output'];
+  required: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+  type: QuestionType;
+};
+
+export type QuestionInput = {
+  id: Scalars['ID']['input'];
+  options: Array<OptionInput>;
+  order: Scalars['Int']['input'];
+  required: Scalars['Boolean']['input'];
+  title: Scalars['String']['input'];
+  type: QuestionType;
+};
+
+export type QuestionType = 'CHECKBOX' | 'DATE' | 'MULTIPLE_CHOICE' | 'TEXT';
+
+export type Response = {
+  __typename?: 'Response';
+  answers: Array<Answer>;
+  formId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  submittedAt: Scalars['String']['output'];
+};
+
+export type ResolverTypeWrapper<T> = Promise<T> | T;
+
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+};
+export type Resolver<
+  TResult,
+  TParent = Record<PropertyKey, never>,
+  TContext = Record<PropertyKey, never>,
+  TArgs = Record<PropertyKey, never>,
+> =
+  | ResolverFn<TResult, TParent, TContext, TArgs>
+  | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => Promise<TResult> | TResult;
+
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
+
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => TResult | Promise<TResult>;
+
+export interface SubscriptionSubscriberObject<
+  TResult,
+  TKey extends string,
+  TParent,
+  TContext,
+  TArgs,
+> {
+  subscribe: SubscriptionSubscribeFn<
+    { [key in TKey]: TResult },
+    TParent,
+    TContext,
+    TArgs
+  >;
+  resolve?: SubscriptionResolveFn<
+    TResult,
+    { [key in TKey]: TResult },
+    TContext,
+    TArgs
+  >;
+}
+
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<unknown, TParent, TContext, TArgs>;
+  resolve: SubscriptionResolveFn<TResult, unknown, TContext, TArgs>;
+}
+
+export type SubscriptionObject<
+  TResult,
+  TKey extends string,
+  TParent,
+  TContext,
+  TArgs,
+> =
+  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
+
+export type SubscriptionResolver<
+  TResult,
+  TKey extends string,
+  TParent = Record<PropertyKey, never>,
+  TContext = Record<PropertyKey, never>,
+  TArgs = Record<PropertyKey, never>,
+> =
+  | ((
+      ...args: never[]
+    ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
+
+export type TypeResolveFn<
+  TTypes,
+  TParent = Record<PropertyKey, never>,
+  TContext = Record<PropertyKey, never>,
+> = (
+  parent: TParent,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
+
+export type IsTypeOfResolverFn<
+  T = Record<PropertyKey, never>,
+  TContext = Record<PropertyKey, never>,
+> = (
+  obj: T,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => boolean | Promise<boolean>;
+
+export type NextResolverFn<T> = () => Promise<T>;
+
+export type DirectiveResolverFn<
+  TResult = Record<PropertyKey, never>,
+  TParent = Record<PropertyKey, never>,
+  TContext = Record<PropertyKey, never>,
+  TArgs = Record<PropertyKey, never>,
+> = (
+  next: NextResolverFn<TResult>,
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => TResult | Promise<TResult>;
+
+export type ResolversTypes = {
+  Answer: ResolverTypeWrapper<Answer>;
+  AnswerInput: AnswerInput;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Form: ResolverTypeWrapper<Form>;
+  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  Option: ResolverTypeWrapper<Option>;
+  OptionInput: OptionInput;
+  Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  Question: ResolverTypeWrapper<Question>;
+  QuestionInput: QuestionInput;
+  QuestionType: QuestionType;
+  Response: ResolverTypeWrapper<Response>;
+  String: ResolverTypeWrapper<Scalars['String']['output']>;
+};
+
+export type ResolversParentTypes = {
+  Answer: Answer;
+  AnswerInput: AnswerInput;
+  Boolean: Scalars['Boolean']['output'];
+  Form: Form;
+  ID: Scalars['ID']['output'];
+  Int: Scalars['Int']['output'];
+  Mutation: Record<PropertyKey, never>;
+  Option: Option;
+  OptionInput: OptionInput;
+  Query: Record<PropertyKey, never>;
+  Question: Question;
+  QuestionInput: QuestionInput;
+  Response: Response;
+  String: Scalars['String']['output'];
+};
+
+export type AnswerResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Answer'] =
+    ResolversParentTypes['Answer'],
+> = {
+  questionId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  value?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+};
+
+export type FormResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Form'] =
+    ResolversParentTypes['Form'],
+> = {
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  questions?: Resolver<
+    Array<ResolversTypes['Question']>,
+    ParentType,
+    ContextType
+  >;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
+export type MutationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Mutation'] =
+    ResolversParentTypes['Mutation'],
+> = {
+  createForm?: Resolver<
+    ResolversTypes['Form'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateFormArgs, 'questions' | 'title'>
+  >;
+  submitResponse?: Resolver<
+    ResolversTypes['Response'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSubmitResponseArgs, 'answers' | 'formId'>
+  >;
+};
+
+export type OptionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Option'] =
+    ResolversParentTypes['Option'],
+> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
+export type QueryResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Query'] =
+    ResolversParentTypes['Query'],
+> = {
+  form?: Resolver<
+    Maybe<ResolversTypes['Form']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryFormArgs, 'id'>
+  >;
+  forms?: Resolver<Array<ResolversTypes['Form']>, ParentType, ContextType>;
+  responses?: Resolver<
+    Array<ResolversTypes['Response']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryResponsesArgs, 'formId'>
+  >;
+};
+
+export type QuestionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Question'] =
+    ResolversParentTypes['Question'],
+> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  options?: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
+  order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  required?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['QuestionType'], ParentType, ContextType>;
+};
+
+export type ResponseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes['Response'] =
+    ResolversParentTypes['Response'],
+> = {
+  answers?: Resolver<Array<ResolversTypes['Answer']>, ParentType, ContextType>;
+  formId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  submittedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
+export type Resolvers<ContextType = GraphQLContext> = {
+  Answer?: AnswerResolvers<ContextType>;
+  Form?: FormResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
+  Option?: OptionResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
+  Question?: QuestionResolvers<ContextType>;
+  Response?: ResponseResolvers<ContextType>;
+};

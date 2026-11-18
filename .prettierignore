@@ -1,0 +1,4 @@
+.tsupgrader/
+.github/modernize/code-migration/
+**/dist/
+**/node_modules/
