@@ -24,14 +24,6 @@ export const validateForm = (
   );
 };
 
-export const validateQuestions = (
-  questions: readonly QuestionInput[],
-): void => {
-  throwFirstProblem(
-    validateSharedFormInput({ title: 'Valid title', questions }),
-  );
-};
-
 export const validateAnswers = (
   form: Form,
   answers: readonly AnswerInput[],
