@@ -13,7 +13,7 @@
     "codegen": "graphql-codegen --config codegen.ts && node scripts/normalize-generated.mjs && prettier --write client/src/api/generated.ts shared/src/generated/graphql.ts",
     "typecheck": "npm run codegen && npm run build -w shared && npm run typecheck -w server && npm run typecheck -w client",
     "lint": "eslint .",
-    "test": "npm run codegen && npm run build -w shared && npm run test -w server && npm run test -w client",
+    "test": "npm run codegen && npm run build -w shared && npm run test -w shared && npm run test -w server && npm run test -w client",
     "format": "prettier --write ."
   },
   "devDependencies": {
