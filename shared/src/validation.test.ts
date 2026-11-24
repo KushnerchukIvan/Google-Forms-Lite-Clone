@@ -132,7 +132,7 @@ describe('validateAnswerInput', () => {
     ).toEqual([]);
     expect(validateAnswerInput(form, [])).toContainEqual({
       target: { questionId: 'name' },
-      message: '“Name” is required.',
+      message: '"Name" is required.',
     });
   });
 

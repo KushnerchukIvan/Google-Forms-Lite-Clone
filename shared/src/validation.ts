@@ -12,7 +12,7 @@ export type FormValidationQuestion = Pick<
 
 export interface FormValidationInput {
   title: string;
-  description?: string | null;
+  description?: string | null | undefined;
   questions: readonly FormValidationQuestion[];
 }
 
@@ -194,7 +194,7 @@ export const validateAnswerInput = (
 
     if (question.required && answer.value.every((value) => !value.trim())) {
       problems.push(
-        questionProblem(question.id, `“${question.title}” is required.`),
+        questionProblem(question.id, `"${question.title}" is required.`),
       );
       continue;
     }
@@ -264,7 +264,7 @@ export const validateAnswerInput = (
   for (const question of form.questions) {
     if (question.required && !submittedIds.has(question.id)) {
       problems.push(
-        questionProblem(question.id, `“${question.title}” is required.`),
+        questionProblem(question.id, `"${question.title}" is required.`),
       );
     }
   }
