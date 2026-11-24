@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useGetFormsQuery } from '../api/enhanced';
+import { useHomeForms } from '../hooks/useHomeForms';
 
 export function HomePage() {
-  const { data, isLoading, error, refetch } = useGetFormsQuery(undefined);
-  const forms = data?.forms ?? [];
+  const { forms, isLoading, error, refetch } = useHomeForms();
+
   return (
     <main className="page">
       <div className="page-heading">
@@ -47,8 +47,7 @@ export function HomePage() {
               {form.description || 'No description'}
             </p>
             <p className="meta">
-              {form.questions.length} questions · Created{' '}
-              {new Date(form.createdAt).toLocaleDateString()}
+              {form.questionCount} questions · Created {form.createdDate}
             </p>
             <div className="card-actions">
               <Link className="button" to={`/forms/${form.id}/fill`}>
