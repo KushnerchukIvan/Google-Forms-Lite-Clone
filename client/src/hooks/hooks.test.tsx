@@ -99,7 +99,7 @@ describe('form workflow hooks', () => {
       },
     ];
     await store.dispatch(
-      api.util.upsertQueryData('GetForms', undefined, { forms }),
+      api.util.upsertQueryData('GetForms', {}, { forms }),
     );
     const { result } = renderHook(() => useHomeForms(), {
       wrapper: createWrapper(store, '/', '/'),

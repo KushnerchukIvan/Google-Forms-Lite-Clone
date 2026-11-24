@@ -1,7 +1,7 @@
 import { useGetFormsQuery } from '../api/enhanced';
 
 export const useHomeForms = () => {
-  const { data, isLoading, error, refetch } = useGetFormsQuery(undefined);
+  const { data, isLoading, error, refetch } = useGetFormsQuery({});
   const forms = (data?.forms ?? []).map((form) => ({
     ...form,
     questionCount: form.questions.length,
