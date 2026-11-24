@@ -15,14 +15,16 @@ const config: CodegenConfig = {
       },
     },
     './client/src/api/generated.ts': {
-      plugins: ['typescript-operations'],
+      plugins: ['typescript-operations', 'typescript-rtk-query'],
       config: {
         enumsAsTypes: true,
         scalars: { ID: 'string' },
         defaultScalarType: 'unknown',
         importSchemaTypesFrom: './shared/src/generated/graphql.ts',
         namespacedImportName: 'Types',
-        documentMode: 'plainString',
+        documentMode: 'string',
+        importBaseApiFrom: './baseApi',
+        exportHooks: true,
         useTypeImports: true,
       },
     },

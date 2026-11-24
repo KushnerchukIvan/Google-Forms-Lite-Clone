@@ -9,7 +9,7 @@ export interface GraphQLApiError {
 
 interface GraphQLRequestArgs {
   document: string;
-  variables?: Record<string, unknown>;
+  variables?: unknown;
 }
 
 const networkErrorMessage =

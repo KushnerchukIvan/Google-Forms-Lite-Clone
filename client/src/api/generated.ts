@@ -8,6 +8,8 @@ export type Incremental<T> =
     };
 import type * as Types from '../../../shared/src/generated/graphql';
 
+import type { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+import { api } from './baseApi';
 export type CreateFormMutationVariables = Exact<{
   title: string;
   description?: string | null | undefined;
@@ -90,3 +92,158 @@ export type SubmitResponseMutation = {
     answers: Array<{ questionId: string; value: Array<string> }>;
   };
 };
+
+export class TypedDocumentString<TResult, TVariables>
+  extends String
+  implements DocumentTypeDecoration<TResult, TVariables>
+{
+  __apiType?: NonNullable<
+    DocumentTypeDecoration<TResult, TVariables>['__apiType']
+  >;
+  private value: string;
+  public __meta__?: Record<string, any> | undefined;
+
+  constructor(value: string, __meta__?: Record<string, any> | undefined) {
+    super(value);
+    this.value = value;
+    this.__meta__ = __meta__;
+  }
+
+  override toString(): string & DocumentTypeDecoration<TResult, TVariables> {
+    return this.value;
+  }
+}
+
+export const CreateFormDocument = new TypedDocumentString(`
+    mutation CreateForm($title: String!, $description: String, $questions: [QuestionInput!]!) {
+  createForm(title: $title, description: $description, questions: $questions) {
+    id
+    title
+    description
+    createdAt
+    questions {
+      id
+      title
+      type
+      required
+      order
+      options {
+        id
+        label
+      }
+    }
+  }
+}
+    `);
+export const GetFormDocument = new TypedDocumentString(`
+    query GetForm($id: ID!) {
+  form(id: $id) {
+    id
+    title
+    description
+    createdAt
+    questions {
+      id
+      title
+      type
+      required
+      order
+      options {
+        id
+        label
+      }
+    }
+  }
+}
+    `);
+export const GetFormsDocument = new TypedDocumentString(`
+    query GetForms {
+  forms {
+    id
+    title
+    description
+    createdAt
+    questions {
+      id
+    }
+  }
+}
+    `);
+export const GetResponsesDocument = new TypedDocumentString(`
+    query GetResponses($formId: ID!) {
+  responses(formId: $formId) {
+    id
+    formId
+    submittedAt
+    answers {
+      questionId
+      value
+    }
+  }
+}
+    `);
+export const SubmitResponseDocument = new TypedDocumentString(`
+    mutation SubmitResponse($formId: ID!, $answers: [AnswerInput!]!) {
+  submitResponse(formId: $formId, answers: $answers) {
+    id
+    formId
+    submittedAt
+    answers {
+      questionId
+      value
+    }
+  }
+}
+    `);
+
+const injectedRtkApi = api.injectEndpoints({
+  endpoints: (build) => ({
+    CreateForm: build.mutation<CreateFormMutation, CreateFormMutationVariables>(
+      {
+        query: (variables) => ({
+          document: CreateFormDocument as unknown as string,
+          variables,
+        }),
+      },
+    ),
+    GetForm: build.query<GetFormQuery, GetFormQueryVariables>({
+      query: (variables) => ({
+        document: GetFormDocument as unknown as string,
+        variables,
+      }),
+    }),
+    GetForms: build.query<GetFormsQuery, GetFormsQueryVariables | void>({
+      query: (variables) => ({
+        document: GetFormsDocument as unknown as string,
+        variables,
+      }),
+    }),
+    GetResponses: build.query<GetResponsesQuery, GetResponsesQueryVariables>({
+      query: (variables) => ({
+        document: GetResponsesDocument as unknown as string,
+        variables,
+      }),
+    }),
+    SubmitResponse: build.mutation<
+      SubmitResponseMutation,
+      SubmitResponseMutationVariables
+    >({
+      query: (variables) => ({
+        document: SubmitResponseDocument as unknown as string,
+        variables,
+      }),
+    }),
+  }),
+});
+
+export { injectedRtkApi as api };
+export const {
+  useCreateFormMutation,
+  useGetFormQuery,
+  useLazyGetFormQuery,
+  useGetFormsQuery,
+  useLazyGetFormsQuery,
+  useGetResponsesQuery,
+  useLazyGetResponsesQuery,
+  useSubmitResponseMutation,
+} = injectedRtkApi;

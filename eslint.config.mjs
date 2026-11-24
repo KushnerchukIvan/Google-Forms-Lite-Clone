@@ -20,7 +20,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/generated/**/*.ts'],
+    files: ['**/generated/**/*.ts', '**/generated.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -34,6 +34,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'off',
       '@typescript-eslint/no-unsafe-unary-minus': 'off',
+      '@typescript-eslint/no-duplicate-type-constituents': 'off',
+      '@typescript-eslint/no-invalid-void-type': 'off',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
     },
   },
   {
