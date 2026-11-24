@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useHomeForms } from '../hooks/useHomeForms';
 
 export function HomePage() {
-  const { forms, isLoading, error, refetch } = useHomeForms();
+  const { forms, isLoading, errorMessage, refetch } = useHomeForms();
 
   return (
     <main className="page">
@@ -19,15 +19,15 @@ export function HomePage() {
         </Link>
       </div>
       {isLoading && <p className="state">Loading forms…</p>}
-      {error && (
+      {errorMessage && (
         <div className="state error">
-          Could not load forms.{' '}
+          {errorMessage}{' '}
           <button className="text-button" onClick={() => void refetch()}>
             Try again
           </button>
         </div>
       )}
-      {!isLoading && !error && forms.length === 0 && (
+      {!isLoading && !errorMessage && forms.length === 0 && (
         <div className="empty panel">
           <h2>No forms yet</h2>
           <p className="muted">

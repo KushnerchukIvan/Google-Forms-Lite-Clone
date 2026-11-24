@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useGetFormQuery, useGetResponsesQuery } from '../api/enhanced';
+import { getErrorMessage } from '../services/errors';
 import { formatAnswer } from '../services/answers';
 
 export const useResponses = () => {
@@ -37,12 +38,10 @@ export const useResponses = () => {
     responseCountLabel,
     isLoading: formResult.isLoading || responsesResult.isLoading,
     formError: formResult.error,
-    formErrorMessage: formResult.error ? 'Could not load the form.' : undefined,
+    formErrorMessage: getErrorMessage(formResult.error),
     refetchForm: formResult.refetch,
     responsesError: responsesResult.error,
-    responsesErrorMessage: responsesResult.error
-      ? 'Could not load responses.'
-      : undefined,
+    responsesErrorMessage: getErrorMessage(responsesResult.error),
     refetchResponses: responsesResult.refetch,
   };
 };

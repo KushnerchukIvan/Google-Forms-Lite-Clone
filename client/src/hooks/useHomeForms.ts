@@ -1,4 +1,5 @@
 import { useGetFormsQuery } from '../api/enhanced';
+import { getErrorMessage } from '../services/errors';
 
 export const useHomeForms = () => {
   const { data, isLoading, error, refetch } = useGetFormsQuery({});
@@ -11,7 +12,7 @@ export const useHomeForms = () => {
   return {
     forms,
     isLoading,
-    error,
+    errorMessage: error ? getErrorMessage(error) : undefined,
     refetch,
   };
 };

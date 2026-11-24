@@ -9,6 +9,7 @@ export function FillPage() {
     validationErrors,
     isLoading,
     loadError,
+    loadErrorMessage,
     refetch,
     isSubmitted,
     isSubmitting,
@@ -22,7 +23,7 @@ export function FillPage() {
   if (loadError)
     return (
       <main className="page state error">
-        Could not load this form.{' '}
+        {loadErrorMessage}{' '}
         <button className="text-button" onClick={() => void refetch()}>
           Try again
         </button>
