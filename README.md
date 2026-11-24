@@ -110,7 +110,7 @@ React Router provides four explicit route screens. Route components render prese
 
 ### Code generation
 
-The codegen configuration reads the shared GraphQL schema and client operation documents to create server resolver types and client operation types. Client operation documents are imported as raw strings and used by typed RTK Query endpoints in `client/src/api/enhanced.ts`; this avoids unsafe casts emitted unconditionally by the RTK Query codegen plugin. `codegen.ts` formats generated files through `afterAllFileWrite`. Generated files are committed build artifacts; rerun `npm run codegen` after changing the schema or GraphQL operations.
+The codegen configuration reads the shared GraphQL schema and client operation documents to create server resolver types and a client RTK Query API in `client/src/api/generated.ts`. The `typescript-rtk-query` plugin generates the endpoints and hooks from the documents in `client/src/api/operations`; `client/src/api/enhanced.ts` adds cache tags to that generated API. `codegen.ts` formats generated files through `afterAllFileWrite`. Generated files are committed build artifacts; rerun `npm run codegen` after changing the schema or GraphQL operations.
 
 ### Tests
 
