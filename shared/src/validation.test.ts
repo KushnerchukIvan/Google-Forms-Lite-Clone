@@ -120,6 +120,43 @@ describe('validateFormInput', () => {
       message: 'Only choice questions can have options.',
     });
   });
+
+  it('enforces question title and choice option count and length limits', () => {
+    const problems = validateFormInput({
+      title: 'Contact',
+      questions: [
+        {
+          ...question('long-question'),
+          title: 'Q'.repeat(FORM_LIMITS.questionTitle + 1),
+        },
+        question('choice', 'MULTIPLE_CHOICE', [
+          { id: 'one', label: 'One' },
+          {
+            id: 'two',
+            label: 'L'.repeat(FORM_LIMITS.optionLabel + 1),
+          },
+        ]),
+      ],
+    });
+
+    expect(problems).toContainEqual({
+      target: { questionId: 'long-question' },
+      message: `Question titles can be at most ${String(FORM_LIMITS.questionTitle)} characters.`,
+    });
+    expect(problems).toContainEqual({
+      target: { questionId: 'choice' },
+      message: `Option labels can be at most ${String(FORM_LIMITS.optionLabel)} characters.`,
+    });
+    expect(
+      validateFormInput({
+        title: 'Contact',
+        questions: [question('choice', 'MULTIPLE_CHOICE', [])],
+      }),
+    ).toContainEqual({
+      target: { questionId: 'choice' },
+      message: 'Choice questions need at least two options.',
+    });
+  });
 });
 
 describe('validateAnswerInput', () => {
@@ -181,6 +218,36 @@ describe('validateAnswerInput', () => {
     expect(problems).toContainEqual({
       target: { questionId: 'choice' },
       message: 'Each question can be answered only once.',
+    });
+  });
+
+  it('rejects blank values and excessive checkbox selections', () => {
+    const checkboxForm: Form = {
+      ...form,
+      questions: [
+        ...form.questions,
+        question('checkbox', 'CHECKBOX', [
+          { id: 'one', label: 'One' },
+          { id: 'two', label: 'Two' },
+        ]),
+      ],
+    };
+    const problems = validateAnswerInput(checkboxForm, [
+      { questionId: 'name', value: [''] },
+      { questionId: 'checkbox', value: ['one', 'two', 'one'] },
+    ]);
+
+    expect(problems).toContainEqual({
+      target: { questionId: 'name' },
+      message: '"Name" is required.',
+    });
+    expect(problems).toContainEqual({
+      target: { questionId: 'checkbox' },
+      message: 'Too many checkbox values were submitted.',
+    });
+    expect(problems).toContainEqual({
+      target: { questionId: 'checkbox' },
+      message: 'Duplicate option values are not allowed.',
     });
   });
 });

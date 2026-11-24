@@ -1,4 +1,4 @@
-import { FORM_LIMITS } from '@forms/shared';
+import { validateFormInput } from '@forms/shared';
 import type { FormDraft, FormDraftQuestion } from '../store/formsSlice';
 
 export interface DraftValidationErrors {
@@ -26,68 +26,21 @@ export const createQuestion = (
 
 export const validateDraft = (draft: FormDraft): DraftValidationErrors => {
   const errors: DraftValidationErrors = { questions: {} };
-  const title = draft.title.trim();
-  if (!title) {
-    errors.title = 'Enter a form title.';
-  } else if (title.length > FORM_LIMITS.formTitle) {
-    errors.title = `Form titles can be at most ${String(FORM_LIMITS.formTitle)} characters.`;
-  }
-  if (draft.description.length > FORM_LIMITS.description) {
-    errors.description = `Descriptions can be at most ${String(FORM_LIMITS.description)} characters.`;
-  }
-  if (draft.questions.length === 0) {
-    errors.form = 'Add at least one question.';
-  } else if (draft.questions.length > FORM_LIMITS.questions) {
-    errors.form = `Forms can have at most ${String(FORM_LIMITS.questions)} questions.`;
-  }
-
-  for (const question of draft.questions) {
-    const title = question.title.trim();
-    if (!title) {
-      errors.questions[question.id] = 'Every question needs a title.';
-      continue;
-    }
-    if (title.length > FORM_LIMITS.questionTitle) {
-      errors.questions[question.id] =
-        `Question titles can be at most ${String(FORM_LIMITS.questionTitle)} characters.`;
-      continue;
-    }
-    if (
-      (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') &&
-      question.options.length < 2
-    ) {
-      errors.questions[question.id] =
-        'Choice questions need at least two options.';
-      continue;
-    }
-    if (question.type === 'MULTIPLE_CHOICE' || question.type === 'CHECKBOX') {
-      if (question.options.length > FORM_LIMITS.optionsPerQuestion) {
-        errors.questions[question.id] =
-          `Questions can have at most ${String(FORM_LIMITS.optionsPerQuestion)} options.`;
-        continue;
+  for (const problem of validateFormInput(draft)) {
+    if ('field' in problem.target) {
+      switch (problem.target.field) {
+        case 'title':
+          errors.title ??= problem.message;
+          break;
+        case 'description':
+          errors.description ??= problem.message;
+          break;
+        case 'questions':
+          errors.form ??= problem.message;
+          break;
       }
-      const optionIds = question.options.map((option) => option.id);
-      if (new Set(optionIds).size !== optionIds.length) {
-        errors.questions[question.id] = 'Choice option IDs must be unique.';
-        continue;
-      }
-      const labels = question.options.map((option) => option.label.trim());
-      if (labels.some((label) => !label)) {
-        errors.questions[question.id] = 'Choice options need non-empty labels.';
-        continue;
-      }
-      if (labels.some((label) => label.length > FORM_LIMITS.optionLabel)) {
-        errors.questions[question.id] =
-          `Option labels can be at most ${String(FORM_LIMITS.optionLabel)} characters.`;
-        continue;
-      }
-      if (
-        new Set(labels.map((label) => label.toLowerCase())).size !==
-        labels.length
-      ) {
-        errors.questions[question.id] =
-          'Choice options must be unique, ignoring case.';
-      }
+    } else {
+      errors.questions[problem.target.questionId] ??= problem.message;
     }
   }
   return errors;
