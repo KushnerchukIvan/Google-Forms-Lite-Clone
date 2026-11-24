@@ -12,7 +12,7 @@ export const useHomeForms = () => {
   return {
     forms,
     isLoading,
-    errorMessage: error ? getErrorMessage(error) : undefined,
+    errorMessage: getErrorMessage(error),
     refetch,
   };
 };
