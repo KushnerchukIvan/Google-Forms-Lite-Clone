@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useGetFormsQuery } from '../api/enhanced';
+import { useHomeForms } from '../hooks/useHomeForms';
 
 export function HomePage() {
-  const { data, isLoading, error, refetch } = useGetFormsQuery(undefined);
-  const forms = data?.forms ?? [];
+  const { forms, isLoading, errorMessage, refetch } = useHomeForms();
+
   return (
     <main className="page">
       <div className="page-heading">
@@ -19,15 +19,15 @@ export function HomePage() {
         </Link>
       </div>
       {isLoading && <p className="state">Loading forms…</p>}
-      {error && (
+      {errorMessage && (
         <div className="state error">
-          Could not load forms.{' '}
+          {errorMessage}{' '}
           <button className="text-button" onClick={() => void refetch()}>
             Try again
           </button>
         </div>
       )}
-      {!isLoading && !error && forms.length === 0 && (
+      {!isLoading && !errorMessage && forms.length === 0 && (
         <div className="empty panel">
           <h2>No forms yet</h2>
           <p className="muted">
@@ -47,8 +47,7 @@ export function HomePage() {
               {form.description || 'No description'}
             </p>
             <p className="meta">
-              {form.questions.length} questions · Created{' '}
-              {new Date(form.createdAt).toLocaleDateString()}
+              {form.questionCount} questions · Created {form.createdDate}
             </p>
             <div className="card-actions">
               <Link className="button" to={`/forms/${form.id}/fill`}>

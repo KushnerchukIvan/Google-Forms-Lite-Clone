@@ -1,28 +1,7 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FORM_LIMITS } from '@forms/shared';
-import { useCreateFormMutation } from '../api/enhanced';
 import { QuestionEditor } from '../components/QuestionEditor';
-import {
-  createQuestion,
-  hasDraftValidationErrors,
-  validateDraft,
-  type DraftValidationErrors,
-} from '../services/formBuilder';
-import { getErrorMessage } from '../services/errors';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import {
-  addOption,
-  addQuestion,
-  moveQuestion,
-  removeOption,
-  removeQuestion,
-  resetDraft,
-  setDescription,
-  setTitle,
-  updateOption,
-  updateQuestion,
-} from '../store/formsSlice';
+import { useFormBuilder } from '../hooks/useFormBuilder';
 
 const questionTypes = [
   { type: 'TEXT', label: 'Text' },
@@ -32,38 +11,22 @@ const questionTypes = [
 ] as const;
 
 export function BuilderPage() {
-  const draft = useAppSelector((state) => state.formDraft);
-  const dispatch = useAppDispatch();
-  const [createForm, { isLoading, error }] = useCreateFormMutation();
-  const [validationErrors, setValidationErrors] =
-    useState<DraftValidationErrors | null>(null);
-  const [serverError, setServerError] = useState<string | null>(null);
-  const navigate = useNavigate();
-
-  const save = async () => {
-    const validation = validateDraft(draft);
-    setValidationErrors(validation);
-    setServerError(null);
-    if (hasDraftValidationErrors(validation)) return;
-    try {
-      const result = await createForm({
-        title: draft.title,
-        description: draft.description,
-        questions: draft.questions.map((question, order) => ({
-          ...question,
-          order,
-        })),
-      }).unwrap();
-      dispatch(resetDraft());
-      void navigate(`/forms/${result.createForm.id}/fill`);
-    } catch (error) {
-      setServerError(
-        getErrorMessage(error) ??
-          'The form could not be saved. Please try again.',
-      );
-    }
-  };
-
+  const {
+    draft,
+    validationErrors,
+    isLoading,
+    errorMessage,
+    setTitle,
+    setDescription,
+    addQuestion,
+    updateQuestion,
+    addOption,
+    updateOption,
+    removeOption,
+    removeQuestion,
+    moveQuestion,
+    save,
+  } = useFormBuilder();
   return (
     <main className="page narrow">
       <Link className="back-link" to="/">
@@ -92,9 +55,7 @@ export function BuilderPage() {
           }
           value={draft.title}
           placeholder="Untitled form"
-          onChange={(event) => {
-            dispatch(setTitle(event.target.value));
-          }}
+          onChange={(event) => setTitle(event.target.value)}
         />
         {validationErrors?.title && (
           <p
@@ -116,9 +77,7 @@ export function BuilderPage() {
           }
           value={draft.description}
           placeholder="Form description (optional)"
-          onChange={(event) => {
-            dispatch(setDescription(event.target.value));
-          }}
+          onChange={(event) => setDescription(event.target.value)}
         />
         {validationErrors?.description && (
           <p
@@ -140,26 +99,14 @@ export function BuilderPage() {
           {...(validationErrors?.questions[question.id]
             ? { error: validationErrors.questions[question.id] }
             : {})}
-          onChange={(changes) => {
-            dispatch(updateQuestion({ id: question.id, changes }));
-          }}
-          onOptionAdd={(option) => {
-            dispatch(addOption({ questionId: question.id, option }));
-          }}
-          onOptionChange={(optionId, label) => {
-            dispatch(
-              updateOption({ questionId: question.id, optionId, label }),
-            );
-          }}
-          onOptionRemove={(optionId) => {
-            dispatch(removeOption({ questionId: question.id, optionId }));
-          }}
-          onRemove={() => {
-            dispatch(removeQuestion(question.id));
-          }}
-          onMove={(direction) => {
-            dispatch(moveQuestion({ id: question.id, direction }));
-          }}
+          onChange={(changes) => updateQuestion(question.id, changes)}
+          onOptionAdd={(option) => addOption(question.id, option)}
+          onOptionChange={(optionId, label) =>
+            updateOption(question.id, optionId, label)
+          }
+          onOptionRemove={(optionId) => removeOption(question.id, optionId)}
+          onRemove={() => removeQuestion(question.id)}
+          onMove={(direction) => moveQuestion(question.id, direction)}
         />
       ))}
       <section className="panel add-question">
@@ -170,9 +117,7 @@ export function BuilderPage() {
               key={type}
               type="button"
               className="button secondary"
-              onClick={() => {
-                dispatch(addQuestion(createQuestion(type)));
-              }}
+              onClick={() => addQuestion(type)}
             >
               + {label}
             </button>
@@ -184,9 +129,9 @@ export function BuilderPage() {
           </p>
         )}
       </section>
-      {(serverError || error) && (
+      {errorMessage && (
         <p className="error-message" role="alert" aria-live="polite">
-          {serverError ?? getErrorMessage(error) ?? 'Something went wrong.'}
+          {errorMessage}
         </p>
       )}
       <div className="bottom-actions">

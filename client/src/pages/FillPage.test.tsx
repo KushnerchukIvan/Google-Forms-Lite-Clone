@@ -1,5 +1,3 @@
-// @vitest-environment jsdom
-
 import { FORM_LIMITS } from '@forms/shared';
 import {
   cleanup,
@@ -84,7 +82,7 @@ describe('FillPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Submit response' }));
     const validationAlert = await screen.findByRole('alert');
     expect(validationAlert.textContent).toContain(
-      '“Preferred contact” is required.',
+      '"Preferred contact" is required.',
     );
 
     fireEvent.click(screen.getByRole('radio', { name: 'Email' }));

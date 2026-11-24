@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
 };
+/** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string };
   String: { input: string; output: string };
@@ -162,8 +163,8 @@ export interface SubscriptionSubscriberObject<
 }
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<unknown, TParent, TContext, TArgs>;
-  resolve: SubscriptionResolveFn<TResult, unknown, TContext, TArgs>;
+  subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
+  resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
 export type SubscriptionObject<
@@ -184,7 +185,7 @@ export type SubscriptionResolver<
   TArgs = Record<PropertyKey, never>,
 > =
   | ((
-      ...args: never[]
+      ...args: any[]
     ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
@@ -222,6 +223,7 @@ export type DirectiveResolverFn<
   info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
 
+/** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Answer: ResolverTypeWrapper<Answer>;
   AnswerInput: AnswerInput;
@@ -240,6 +242,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 };
 
+/** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Answer: Answer;
   AnswerInput: AnswerInput;

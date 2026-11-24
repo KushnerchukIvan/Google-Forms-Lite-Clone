@@ -1,26 +1,26 @@
-import { Link, useParams } from 'react-router-dom';
-import { useGetFormQuery, useGetResponsesQuery } from '../api/enhanced';
-import { formatAnswer } from '../services/answers';
+import { Link } from 'react-router-dom';
+import { useResponses } from '../hooks/useResponses';
 
 export function ResponsesPage() {
-  const { id = '' } = useParams();
-  const formResult = useGetFormQuery({ id }, { skip: !id });
-  const form = formResult.data?.form ?? null;
-  const responsesResult = useGetResponsesQuery(
-    { formId: id },
-    { skip: !id || !form },
-  );
-  const responses = responsesResult.data?.responses ?? [];
-  if (formResult.isLoading || responsesResult.isLoading)
-    return <main className="page state">Loading responses…</main>;
-  if (formResult.error)
+  const {
+    form,
+    responses,
+    responseCountLabel,
+    isLoading,
+    formError,
+    formErrorMessage,
+    refetchForm,
+    responsesError,
+    responsesErrorMessage,
+    refetchResponses,
+  } = useResponses();
+
+  if (isLoading) return <main className="page state">Loading responses…</main>;
+  if (formError)
     return (
       <main className="page state error">
-        Could not load the form.{' '}
-        <button
-          className="text-button"
-          onClick={() => void formResult.refetch()}
-        >
+        {formErrorMessage}{' '}
+        <button className="text-button" onClick={() => void refetchForm()}>
           Try again
         </button>
       </main>
@@ -31,13 +31,13 @@ export function ResponsesPage() {
         Form not found. <Link to="/">Go home</Link>
       </main>
     );
-  if (responsesResult.error)
+  if (responsesError)
     return (
       <main className="page state error">
-        Could not load responses.{' '}
+        {responsesErrorMessage}{' '}
         <button
           className="text-button"
-          onClick={() => void responsesResult.refetch()}
+          onClick={() => void refetchResponses()}
         >
           Try again
         </button>
@@ -53,10 +53,7 @@ export function ResponsesPage() {
         <div>
           <p className="eyebrow">RESPONSES</p>
           <h1>{form.title}</h1>
-          <p className="muted">
-            {responses.length}{' '}
-            {responses.length === 1 ? 'submission' : 'submissions'}
-          </p>
+          <p className="muted">{responseCountLabel}</p>
         </div>
         <Link className="button secondary" to={`/forms/${form.id}/fill`}>
           Open form
@@ -68,29 +65,22 @@ export function ResponsesPage() {
           <p className="muted">Share the form to start collecting answers.</p>
         </div>
       )}
-      {responses.map((response, index) => (
+      {responses.map((response) => (
         <article className="panel response-card" key={response.id}>
           <div className="question-toolbar">
-            <h2>Response {index + 1}</h2>
-            <span className="meta">
-              {new Date(response.submittedAt).toLocaleString()}
-            </span>
+            <h2>{response.label}</h2>
+            <span className="meta">{response.submittedDate}</span>
           </div>
-          {form.questions.map((question) => {
-            const answer = response.answers.find(
-              (item) => item.questionId === question.id,
-            );
-            return (
-              <div className="response-answer" key={question.id}>
-                <strong>{question.title}</strong>
-                <p>
-                  {formatAnswer(question, answer?.value ?? []).join(', ') || (
-                    <span className="muted">No answer</span>
-                  )}
-                </p>
-              </div>
-            );
-          })}
+          {response.answers.map((answer) => (
+            <div className="response-answer" key={answer.questionId}>
+              <strong>{answer.questionTitle}</strong>
+              <p>
+                {answer.values.join(', ') || (
+                  <span className="muted">No answer</span>
+                )}
+              </p>
+            </div>
+          ))}
         </article>
       ))}
     </main>

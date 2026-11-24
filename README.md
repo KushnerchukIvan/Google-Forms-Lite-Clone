@@ -23,10 +23,10 @@ The dev command generates GraphQL artifacts, builds the shared package, and then
 | Command             | Description                                                        |
 | ------------------- | ------------------------------------------------------------------ |
 | `npm run dev`       | Generate GraphQL artifacts and run client + server                 |
-| `npm run codegen`   | Generate shared schema/operation types and RTK Query API artifacts |
+| `npm run codegen`   | Generate shared schema and client operation types               |
 | `npm run typecheck` | Type-check all workspaces                                          |
 | `npm run lint`      | Run strict ESLint checks                                           |
-| `npm run test`      | Run server and client tests                                        |
+| `npm run test`      | Run shared, server, and client tests                               |
 | `npm run build`     | Generate artifacts and build all workspaces                        |
 | `npm run format`    | Format the repository with Prettier                                |
 
@@ -40,20 +40,24 @@ Copy `.env.example` to `.env` if you need to override defaults. `PORT` configure
 .
 ├── client
 │   └── src
-│       ├── api             # RTK Query base API and generated hooks
+│       ├── api             # RTK Query base API and typed endpoints
+│       │   └── operations  # GraphQL operation documents
 │       ├── components      # Presentation components
-│       ├── pages           # Route-level screens
-│       ├── services        # Form and answer business logic
+│       ├── hooks           # Route workflow state, queries, and actions
+│       ├── pages           # Screens that render hook results
+│       ├── services        # Shared-validation adapters and display transforms
 │       └── store           # Redux store and local builder draft slice
 ├── server
 │   └── src
 │       ├── domain.ts       # Server domain types
 │       ├── resolvers.ts    # GraphQL resolvers
 │       ├── store.ts        # Injectable in-memory store
-│       └── validation.ts   # Server-side input validation
+│       └── validation.ts   # Thin shared-validation adapters
 ├── shared
 │   ├── schema.graphql      # Single source of truth
-│   └── src/generated       # GraphQL Code Generator output
+│   └── src
+│       ├── generated       # GraphQL Code Generator output
+│       └── validation.ts   # Shared form and answer rules
 └── codegen.ts
 ```
 
@@ -98,19 +102,19 @@ RTK Query owns all server state and cache entries. The Redux slice is reserved f
 
 ### Routing and UI structure
 
-React Router provides four explicit route screens. Route components compose small presentation components and delegate validation and transformations to services. This avoids a global state abstraction for route-local workflows.
+React Router provides four explicit route screens. Route components render presentation components from route-specific hooks: `useFormBuilder`, `useFormFill`, `useHomeForms`, and `useResponses`. These hooks own mutations, draft state, validation state, query orchestration, formatting, and response grouping. The Redux slice remains limited to the form-builder draft.
 
 ### Validation and error handling
 
-The client validates common form errors for immediate feedback. The server repeats all domain-critical checks because client validation is not trusted. GraphQL errors include stable extension codes and human-readable messages. The UI distinguishes loading, error, empty, and success states.
+`shared/src/validation.ts` is the source of truth for form and answer rules. The client services adapt its structured problems to field-level messages; server wrappers turn the first problem into a `BAD_USER_INPUT` GraphQL error. A form must contain at least one question on both sides, matching the former client-only rule. `baseApi` normalizes GraphQL and network failures to `{ message }`, and the UI reads that message from RTK Query results.
 
 ### Code generation
 
-The codegen configuration reads the shared GraphQL schema and client operation documents. It generates schema/operation types and RTK Query hooks. Generated files are committed build artifacts so changes are visible in reviews and available in fresh checkouts. Rerun `npm run codegen` after changing the schema or GraphQL operations.
+The codegen configuration reads the shared GraphQL schema and client operation documents to create server resolver types and a client RTK Query API in `client/src/api/generated.ts`. The `typescript-rtk-query` plugin generates the endpoints and hooks from the documents in `client/src/api/operations`; `client/src/api/enhanced.ts` adds cache tags to that generated API. `codegen.ts` formats generated files through `afterAllFileWrite`. Generated files are committed build artifacts; rerun `npm run codegen` after changing the schema or GraphQL operations.
 
 ### Tests
 
-Vitest covers server-side validation and GraphQL resolver flows, plus client-side form/answer utilities, draft state, and key builder/filler/response interactions. Cases include required answers, date checks, question ordering, answer normalization, and GraphQL error codes. Validation functions receive their form/store dependencies explicitly, allowing focused tests without starting an HTTP server.
+Vitest covers shared form and answer validation, GraphQL resolver flows, client-side adapters and draft state, each route hook, and key page interactions. API tests cover GraphQL server errors, connection failures, and successful requests. Cases include required answers, date checks, question ordering, answer normalization, and GraphQL error codes. Validation functions receive their form/store dependencies explicitly, allowing focused tests without starting an HTTP server.
 
 See [DECISIONS.md](./DECISIONS.md) for the alternatives considered and rationale for the schema, code generation, client/server structure, state, validation, errors, IDs, ordering, and tests.
 

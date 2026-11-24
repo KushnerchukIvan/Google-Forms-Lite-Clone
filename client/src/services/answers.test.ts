@@ -44,13 +44,13 @@ describe('answer transformations', () => {
 
   it('rejects calendar-invalid date answers', () => {
     expect(validateResponse(form, { date: ['2026-02-31'] })).toEqual({
-      date: 'Enter a valid date.',
+      date: 'Date answers must use YYYY-MM-DD format.',
     });
   });
 
   it('rejects choices that do not belong to the question', () => {
     expect(validateResponse(form, { choice: ['other-id'] })).toEqual({
-      choice: '"Choice" contains an invalid option.',
+      choice: 'An answer for "Choice" is not one of its options.',
     });
   });
 

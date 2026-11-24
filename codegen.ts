@@ -2,7 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   schema: './shared/schema.graphql',
-  documents: './client/src/**/*.graphql',
+  documents: './client/src/api/operations/**/*.graphql',
   generates: {
     './shared/src/generated/graphql.ts': {
       plugins: ['typescript', 'typescript-resolvers'],
@@ -14,26 +14,23 @@ const config: CodegenConfig = {
         useTypeImports: true,
       },
     },
-
     './client/src/api/generated.ts': {
-      plugins: [
-        'typescript-operations',
-        {
-          'typescript-rtk-query': {
-            importBaseApiFrom: './baseApi',
-            exportHooks: true,
-          },
-        },
-      ],
+      plugins: ['typescript-operations', 'typescript-rtk-query'],
       config: {
         enumsAsTypes: true,
         scalars: { ID: 'string' },
         defaultScalarType: 'unknown',
         importSchemaTypesFrom: './shared/src/generated/graphql.ts',
         namespacedImportName: 'Types',
+        documentMode: 'string',
+        importBaseApiFrom: './baseApi',
+        exportHooks: true,
         useTypeImports: true,
       },
     },
+  },
+  hooks: {
+    afterAllFileWrite: ['prettier --write'],
   },
 };
 
