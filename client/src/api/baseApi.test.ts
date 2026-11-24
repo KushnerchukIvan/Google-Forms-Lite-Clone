@@ -46,13 +46,19 @@ describe('normalized GraphQL API errors', () => {
   });
 
   it('returns successful query data without an error', async () => {
-    vi.spyOn(client, 'request').mockResolvedValueOnce({ forms: [] });
+    const request = vi
+      .spyOn(client, 'request')
+      .mockResolvedValueOnce({ forms: [] });
     const store = createAppStore();
     const result = await store.dispatch(
       api.endpoints.GetForms.initiate({}),
     );
+    const document = request.mock.calls[0]?.[0].document;
 
     expect(result).toHaveProperty('data', { forms: [] });
     expect(result).not.toHaveProperty('error');
+    expect(typeof document).toBe('string');
+    if (typeof document !== 'string') throw new Error('Expected query text.');
+    expect(document).toContain('query GetForms');
   });
 });

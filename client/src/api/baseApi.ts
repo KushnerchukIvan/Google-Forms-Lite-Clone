@@ -76,7 +76,11 @@ const normalizedBaseQuery: BaseQueryFn<
   GraphQLApiError
 > = async (args, queryApi, extraOptions) => {
   try {
-    const result = await requestBaseQuery(args, queryApi, extraOptions);
+    const result = await requestBaseQuery(
+      { ...args, document: args.document.valueOf() },
+      queryApi,
+      extraOptions,
+    );
     if (result.error === undefined) return result;
     return {
       error: {
